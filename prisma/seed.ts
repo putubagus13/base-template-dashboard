@@ -1,0 +1,128 @@
+// prisma/seed.ts
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
+const prisma = new PrismaClient();
+
+async function main(): Promise<void> {
+  console.log("🌱 Seeding database...");
+
+  // ─── Permissions ───────────────────────────────────────────
+  const permissions = [
+    // User management
+    { action: "create", subject: "user", description: "Create new users" },
+    { action: "read", subject: "user", description: "View user data" },
+    { action: "update", subject: "user", description: "Update user data" },
+    { action: "delete", subject: "user", description: "Delete users" },
+    // Role management
+    { action: "create", subject: "role", description: "Create new roles" },
+    { action: "read", subject: "role", description: "View role data" },
+    { action: "update", subject: "role", description: "Update roles" },
+    { action: "delete", subject: "role", description: "Delete roles" },
+    // Dashboard
+    { action: "read", subject: "dashboard", description: "Access dashboard" },
+  ];
+
+  const createdPermissions = await Promise.all(
+    permissions.map((p) =>
+      prisma.permission.upsert({
+        where: { action_subject: { action: p.action, subject: p.subject } },
+        update: {},
+        create: p,
+      })
+    )
+  );
+
+  console.log(`✅ Created ${createdPermissions.length} permissions`);
+
+  // ─── Roles ─────────────────────────────────────────────────
+  const adminRole = await prisma.role.upsert({
+    where: { name: "SUPER_ADMIN" },
+    update: {},
+    create: {
+      name: "SUPER_ADMIN",
+      description: "Full system access",
+      isSystem: true,
+    },
+  });
+
+  const userRole = await prisma.role.upsert({
+    where: { name: "USER" },
+    update: {},
+    create: {
+      name: "USER",
+      description: "Standard user access",
+      isSystem: true,
+    },
+  });
+
+  // Assign all permissions to SUPER_ADMIN
+  await Promise.all(
+    createdPermissions.map((permission) =>
+      prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: adminRole.id,
+            permissionId: permission.id,
+          },
+        },
+        update: {},
+        create: { roleId: adminRole.id, permissionId: permission.id },
+      })
+    )
+  );
+
+  // Assign only dashboard read to USER role
+  const dashboardPermission = createdPermissions.find(
+    (p) => p.action === "read" && p.subject === "dashboard"
+  );
+  if (dashboardPermission) {
+    await prisma.rolePermission.upsert({
+      where: {
+        roleId_permissionId: {
+          roleId: userRole.id,
+          permissionId: dashboardPermission.id,
+        },
+      },
+      update: {},
+      create: { roleId: userRole.id, permissionId: dashboardPermission.id },
+    });
+  }
+
+  console.log(`✅ Created roles: SUPER_ADMIN, USER`);
+
+  // ─── Admin User ────────────────────────────────────────────
+  const hashedPassword = await bcrypt.hash("Admin@123456", 12);
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@example.com" },
+    update: {},
+    create: {
+      email: "admin@example.com",
+      name: "Super Admin",
+      password: hashedPassword,
+      status: "ACTIVE",
+      emailVerifiedAt: new Date(),
+    },
+  });
+
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: { userId: adminUser.id, roleId: adminRole.id },
+    },
+    update: {},
+    create: { userId: adminUser.id, roleId: adminRole.id },
+  });
+
+  console.log(`✅ Created admin user: admin@example.com`);
+  console.log("✨ Seeding completed!");
+}
+
+main()
+  .catch((e) => {
+    console.error("❌ Seed failed:", e);
+    process.exit(1);
+  })
+  .finally(() => {
+    void prisma.$disconnect();
+  });

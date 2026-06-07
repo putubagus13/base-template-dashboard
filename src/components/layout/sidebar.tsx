@@ -1,0 +1,138 @@
+// src/components/layout/sidebar.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  Shield,
+  Settings,
+  ChevronRight,
+  Activity,
+  User,
+} from "lucide-react";
+import { cn } from "@/utils/cn";
+import { usePermissions } from "@/hooks/use-permission";
+import type { PermissionString } from "@/types/rbac";
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  // Menggunakan PermissionString ("action:subject") langsung
+  // agar tidak perlu unsafe type cast di renderItem
+  permission?: PermissionString;
+  adminOnly?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    label: "Overview",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    permission: "read:dashboard",
+  },
+  {
+    label: "Users",
+    href: "/dashboard/users",
+    icon: Users,
+    permission: "read:user",
+  },
+  {
+    label: "Roles & Permissions",
+    href: "/dashboard/roles",
+    icon: Shield,
+    permission: "read:role",
+  },
+  {
+    label: "Audit Logs",
+    href: "/dashboard/audit-logs",
+    icon: Activity,
+    permission: "read:user",
+  },
+];
+
+const BOTTOM_ITEMS: NavItem[] = [
+  { label: "Profile", href: "/dashboard/profile", icon: User },
+  {
+    label: "Settings",
+    href: "/dashboard/settings",
+    icon: Settings,
+    adminOnly: true,
+  },
+];
+
+export function Sidebar() {
+  const pathname = usePathname();
+  const { can, isSuperAdmin } = usePermissions();
+
+  const isActive = (href: string) =>
+    href === "/dashboard"
+      ? pathname === "/dashboard"
+      : pathname.startsWith(href);
+
+  const renderItem = (item: NavItem) => {
+    const show =
+      (!item.permission || can(item.permission)) &&
+      (!item.adminOnly || isSuperAdmin);
+
+    if (!show) return null;
+
+    return (
+      <li key={item.href}>
+        <Link
+          href={item.href as unknown as URL}
+          className={cn(
+            "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+            isActive(item.href)
+              ? "bg-indigo-50 text-indigo-700"
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          )}
+        >
+          <item.icon
+            className={cn(
+              "h-4 w-4 shrink-0 transition-colors",
+              isActive(item.href)
+                ? "text-indigo-600"
+                : "text-slate-400 group-hover:text-slate-600"
+            )}
+          />
+          <span className="flex-1">{item.label}</span>
+          {isActive(item.href) && (
+            <ChevronRight className="h-3.5 w-3.5 text-indigo-400" />
+          )}
+        </Link>
+      </li>
+    );
+  };
+
+  return (
+    <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
+      {/* Logo */}
+      <div className="flex h-16 items-center border-b border-slate-200 px-6">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 shadow-sm shadow-indigo-600/30">
+            <span className="text-sm font-bold text-white">D</span>
+          </div>
+          <span className="text-lg font-semibold text-slate-900">
+            Dashboard
+          </span>
+        </div>
+      </div>
+
+      {/* Main nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin">
+        <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+          Main
+        </p>
+        <ul className="space-y-0.5">{NAV_ITEMS.map(renderItem)}</ul>
+      </nav>
+
+      {/* Bottom nav */}
+      <div className="border-t border-slate-200 px-3 py-3">
+        <ul className="space-y-0.5">{BOTTOM_ITEMS.map(renderItem)}</ul>
+      </div>
+    </aside>
+  );
+}

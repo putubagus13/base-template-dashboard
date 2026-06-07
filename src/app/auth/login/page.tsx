@@ -1,0 +1,17 @@
+// src/app/auth/login/page.tsx
+import type { Metadata } from "next";
+import { LoginForm } from "@/components/auth/login-form";
+
+export const metadata: Metadata = { title: "Sign in" };
+
+export default function LoginPage() {
+  return (
+    <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
+        <p className="mt-1 text-sm text-slate-500">Sign in to your account to continue</p>
+      </div>
+      <LoginForm />
+    </>
+  );
+}
