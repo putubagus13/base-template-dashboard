@@ -31,7 +31,12 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      <FormField label="Email address" htmlFor="email" error={errors.email?.message} required>
+      <FormField
+        label="Email address"
+        htmlFor="email"
+        error={errors.email?.message}
+        required
+      >
         <Input
           id="email"
           type="email"
@@ -42,7 +47,12 @@ export function LoginForm() {
         />
       </FormField>
 
-      <FormField label="Password" htmlFor="password" error={errors.password?.message} required>
+      <FormField
+        label="Password"
+        htmlFor="password"
+        error={errors.password?.message}
+        required
+      >
         <div className="relative">
           <Input
             id="password"
@@ -60,7 +70,11 @@ export function LoginForm() {
             tabIndex={-1}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
       </FormField>
@@ -82,15 +96,11 @@ export function LoginForm() {
         </Link>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        isLoading={login.isPending}
-      >
+      <Button type="submit" className="w-full" isLoading={login.isPending}>
         Sign in
       </Button>
 
-      <p className="text-center text-sm text-slate-600">
+      {/* <p className="text-center text-sm text-slate-600">
         Don&apos;t have an account?{" "}
         <Link
           href="/auth/register"
@@ -98,7 +108,7 @@ export function LoginForm() {
         >
           Create one
         </Link>
-      </p>
+      </p> */}
     </form>
   );
 }

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       return ApiResponseBuilder.validationError(formatZodErrors(result.error));
     }
 
-    const { name, email, password } = result.data;
+    const { name, email, password, roleId } = result.data;
 
     // Check duplicate email
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hashPassword(password);
 
     // Get default USER role
-    const userRole = await prisma.role.findUnique({ where: { name: "USER" } });
+    const userRole = await prisma.role.findUnique({ where: { id: roleId } });
 
     const user = await prisma.user.create({
       data: {
@@ -39,9 +39,7 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         status: "PENDING_VERIFICATION",
-        ...(userRole
-          ? { roles: { create: { roleId: userRole.id } } }
-          : {}),
+        ...(userRole ? { roles: { create: { roleId: userRole.id } } } : {}),
       },
       select: { id: true, name: true, email: true, status: true },
     });

@@ -11,9 +11,13 @@ import { useRegister } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/ui/form-field";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function RegisterForm() {
   const register_ = useRegister();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const roleId = searchParams.get("roleId") || "";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -29,9 +33,16 @@ export function RegisterForm() {
     register_.mutate(data);
   };
 
+  if (!roleId) router.push("/auth/login");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      <FormField label="Full name" htmlFor="name" error={errors.name?.message} required>
+      <FormField
+        label="Full name"
+        htmlFor="name"
+        error={errors.name?.message}
+        required
+      >
         <Input
           id="name"
           type="text"
@@ -42,7 +53,12 @@ export function RegisterForm() {
         />
       </FormField>
 
-      <FormField label="Email address" htmlFor="email" error={errors.email?.message} required>
+      <FormField
+        label="Email address"
+        htmlFor="email"
+        error={errors.email?.message}
+        required
+      >
         <Input
           id="email"
           type="email"
@@ -76,7 +92,11 @@ export function RegisterForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             tabIndex={-1}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
       </FormField>
@@ -103,7 +123,11 @@ export function RegisterForm() {
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             tabIndex={-1}
           >
-            {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showConfirm ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         </div>
       </FormField>
@@ -114,7 +138,10 @@ export function RegisterForm() {
 
       <p className="text-center text-sm text-slate-600">
         Already have an account?{" "}
-        <Link href="/auth/login" className="font-medium text-indigo-600 hover:underline">
+        <Link
+          href="/auth/login"
+          className="font-medium text-indigo-600 hover:underline"
+        >
           Sign in
         </Link>
       </p>

@@ -1,6 +1,6 @@
 // src/app/auth/register/page.tsx
 import type { Metadata } from "next";
-import { RegisterForm } from "@/components/auth/register-form";
+import { RegisterForm } from "@/features/auth/register-form";
 
 export const metadata: Metadata = { title: "Create account" };
 

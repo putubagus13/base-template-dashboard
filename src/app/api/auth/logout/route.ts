@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         .catch(() => null); // Ignore error if token not found
     }
 
-    clearAuthCookies();
+    await clearAuthCookies();
 
     return ApiResponseBuilder.success(null, "Logged out successfully.");
   } catch (error) {

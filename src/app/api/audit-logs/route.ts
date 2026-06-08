@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
       return ApiResponseBuilder.forbidden();
     }
 
+    const { id: orgId } = authUser.activeOrganization;
+
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
     const limit = Math.min(
@@ -43,12 +45,19 @@ export async function GET(request: NextRequest) {
 
     const [logs, total] = await prisma.$transaction([
       prisma.auditLog.findMany({
-        where,
+        where: {
+          ...where,
+          user: {
+            organizations: { some: { organizationId: orgId } },
+          },
+        },
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
-          user: { select: { id: true, name: true, email: true } },
+          user: {
+            select: { id: true, name: true, email: true },
+          },
         },
       }),
       prisma.auditLog.count({ where }),

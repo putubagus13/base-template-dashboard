@@ -6,10 +6,7 @@
 
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import {
-  buildAuthUser,
-  setAuthCookies,
-} from "@/lib/auth/helpers";
+import { buildAuthUser, setAuthCookies } from "@/lib/auth/helpers";
 import {
   verifyRefreshToken,
   generateAccessToken,
@@ -28,7 +25,11 @@ export async function POST(request: NextRequest) {
     // Verify JWT signature
     const userId = await verifyRefreshToken(refreshToken).catch(() => null);
     if (!userId) {
-      return ApiResponseBuilder.error("TOKEN_INVALID", "Invalid refresh token.", 401);
+      return ApiResponseBuilder.error(
+        "TOKEN_INVALID",
+        "Invalid refresh token.",
+        401
+      );
     }
 
     // Check token exists in DB and is not used/expired
@@ -42,7 +43,11 @@ export async function POST(request: NextRequest) {
       storedToken.usedAt ||
       storedToken.expiresAt < new Date()
     ) {
-      return ApiResponseBuilder.error("TOKEN_EXPIRED", "Session expired. Please log in again.", 401);
+      return ApiResponseBuilder.error(
+        "TOKEN_EXPIRED",
+        "Session expired. Please log in again.",
+        401
+      );
     }
 
     // Rotate refresh token (invalidate old, create new)
@@ -57,6 +62,7 @@ export async function POST(request: NextRequest) {
       name: authUser.name,
       roles: authUser.roles,
       permissions: authUser.permissions,
+      activeOrganization: authUser.activeOrganization,
     });
     const newRefreshToken = await generateRefreshToken(userId);
 
