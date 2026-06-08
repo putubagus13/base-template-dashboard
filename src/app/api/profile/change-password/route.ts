@@ -2,8 +2,13 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
-import { requireAuthUser, hashPassword, comparePassword } from "@/lib/auth/helpers";
+import {
+  requireAuthUser,
+  hashPassword,
+  comparePassword,
+} from "@/lib/auth/helpers";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
+import { writeAuditLog } from "@/lib/audit";
 
 const changePasswordSchema = z
   .object({
@@ -41,7 +46,10 @@ export async function POST(request: NextRequest) {
 
     if (!user) return ApiResponseBuilder.notFound("User");
 
-    const isCurrentValid = await comparePassword(currentPassword, user.password);
+    const isCurrentValid = await comparePassword(
+      currentPassword,
+      user.password
+    );
     if (!isCurrentValid) {
       return ApiResponseBuilder.error(
         "VALIDATION_ERROR",
@@ -63,6 +71,13 @@ export async function POST(request: NextRequest) {
         where: { userId: authUser.id, type: "REFRESH_TOKEN" },
       }),
     ]);
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "change_password",
+      subject: "auth",
+      request,
+    });
 
     return ApiResponseBuilder.success(
       null,

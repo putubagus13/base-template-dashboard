@@ -12,6 +12,7 @@ import { hasPermission } from "@/lib/auth/rbac";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { writeAuditLog } from "@/lib/audit";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -125,6 +126,15 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
         updatedAt: true,
         roles: { select: { role: { select: { id: true, name: true } } } },
       },
+    });
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "update_user",
+      subject: "user",
+      oldValues: existing,
+      newValues: result.data,
+      request,
     });
 
     return ApiResponseBuilder.success(

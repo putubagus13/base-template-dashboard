@@ -12,6 +12,7 @@ import { requireAuthUser } from "@/lib/auth/helpers";
 import { hasPermission } from "@/lib/auth/rbac";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { Prisma } from "@prisma/client";
+import { writeAuditLog } from "@/lib/audit";
 
 // type RouteParams = { params: { id: string } };
 
@@ -134,6 +135,15 @@ export async function PATCH(
       },
     });
 
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "update_role",
+      subject: "role",
+      oldValues: existing,
+      newValues: result.data,
+      request,
+    });
+
     return ApiResponseBuilder.success(
       { ...role, permissions: role.permissions.map((rp) => rp.permission) },
       "Role updated successfully."
@@ -182,6 +192,14 @@ export async function DELETE(
     }
 
     await prisma.role.delete({ where: { id } });
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "delete_role",
+      subject: "role",
+      oldValues: existing,
+      request: _request,
+    });
 
     return ApiResponseBuilder.success(null, "Role deleted successfully.");
   } catch (error) {

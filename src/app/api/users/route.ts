@@ -11,6 +11,7 @@ import { hasPermission } from "@/lib/auth/rbac";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { z } from "zod";
 import { PaginationMeta } from "@/types";
+import { writeAuditLog } from "@/lib/audit";
 
 const createUserSchema = z.object({
   name: z.string().min(2).max(100),
@@ -153,6 +154,9 @@ export async function POST(request: NextRequest) {
         roles: {
           create: roleIds.map((roleId) => ({ roleId })),
         },
+        organizations: {
+          create: { organizationId: authUser.activeOrganization.id },
+        },
       },
       select: {
         id: true,
@@ -162,6 +166,14 @@ export async function POST(request: NextRequest) {
         createdAt: true,
         roles: { select: { role: { select: { id: true, name: true } } } },
       },
+    });
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "create_user",
+      subject: "user",
+      newValues: result.data,
+      request,
     });
 
     return ApiResponseBuilder.success(

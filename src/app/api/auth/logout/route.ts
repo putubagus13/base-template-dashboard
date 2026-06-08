@@ -1,11 +1,13 @@
 // src/app/api/auth/logout/route.ts
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { clearAuthCookies } from "@/lib/auth/helpers";
+import { clearAuthCookies, requireAuthUser } from "@/lib/auth/helpers";
 import { ApiResponseBuilder } from "@/lib/api-response";
+import { writeAuditLog } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await requireAuthUser();
     const refreshToken = request.cookies.get("refresh_token")?.value;
 
     if (refreshToken) {
@@ -15,6 +17,13 @@ export async function POST(request: NextRequest) {
     }
 
     await clearAuthCookies();
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "logout",
+      subject: "auth",
+      request,
+    });
 
     return ApiResponseBuilder.success(null, "Logged out successfully.");
   } catch (error) {

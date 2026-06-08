@@ -11,6 +11,7 @@ import { hasPermission } from "@/lib/auth/rbac";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { writeAuditLog } from "@/lib/audit";
 
 const createRoleSchema = z.object({
   name: z
@@ -114,6 +115,14 @@ export async function POST(request: NextRequest) {
           },
         },
       },
+    });
+
+    await writeAuditLog({
+      userId: authUser.id,
+      action: "create_role",
+      subject: "role",
+      newValues: result.data,
+      request,
     });
 
     return ApiResponseBuilder.success(
