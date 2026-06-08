@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db/prisma";
 import { verifyAccessToken } from "./jwt";
 import type { AuthUser, JwtPayload } from "@/types/auth";
+import { Organization } from "@/types";
 
 const SALT_ROUNDS = 12;
 const ACCESS_TOKEN_COOKIE = "access_token";
@@ -90,6 +91,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       status: "ACTIVE",
       roles: payload.roles,
       permissions: payload.permissions,
+      activeOrganization: payload.activeOrganization,
     };
   } catch {
     return null;
@@ -129,10 +131,16 @@ export async function buildAuthUser(userId: string): Promise<AuthUser | null> {
           },
         },
       },
+      organizations: {
+        include: {
+          organization: true,
+        },
+      },
     },
   });
 
   if (!user) return null;
+  if (!user.organizations || user.organizations.length === 0) return null;
 
   const roles = user.roles.map((ur) => ur.role.name);
   const permissions = user.roles.flatMap((ur) =>
@@ -152,5 +160,6 @@ export async function buildAuthUser(userId: string): Promise<AuthUser | null> {
     status: user.status,
     roles,
     permissions: uniquePermissions,
+    activeOrganization: user.organizations[0]?.organization as Organization,
   };
 }

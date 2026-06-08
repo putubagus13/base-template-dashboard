@@ -32,7 +32,10 @@ export async function GET(_request: NextRequest) {
       return ApiResponseBuilder.forbidden();
     }
 
+    const { id: orgId } = authUser.activeOrganization;
+
     const roles = await prisma.role.findMany({
+      where: { organizationId: orgId },
       orderBy: { createdAt: "asc" },
       include: {
         permissions: {
@@ -78,6 +81,8 @@ export async function POST(request: NextRequest) {
       return ApiResponseBuilder.forbidden();
     }
 
+    const { id: orgId } = authUser.activeOrganization;
+
     const body: unknown = await request.json();
     const result = createRoleSchema.safeParse(body);
     if (!result.success) {
@@ -86,17 +91,21 @@ export async function POST(request: NextRequest) {
 
     const { name, description, permissionIds } = result.data;
 
-    const existing = await prisma.role.findUnique({ where: { name } });
+    const existing = await prisma.role.findFirst({
+      where: { name, organizationId: orgId },
+    });
     if (existing)
       return ApiResponseBuilder.conflict(`Role "${name}" already exists.`);
 
     const role = await prisma.role.create({
       data: {
+        organizationId: orgId,
         name,
         description,
         permissions: {
           create: permissionIds.map((permissionId) => ({ permissionId })),
         },
+        createdBy: authUser.id,
       } as Prisma.RoleCreateInput,
       include: {
         permissions: {

@@ -1,6 +1,7 @@
 // prisma/seed.ts
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 
@@ -35,23 +36,42 @@ async function main(): Promise<void> {
 
   console.log(`✅ Created ${createdPermissions.length} permissions`);
 
+  const organization = await prisma.organization.upsert({
+    where: {
+      id: uuidv4(),
+      name: "Example Organization",
+      description: "An example organization for seeding purposes",
+    },
+    update: {},
+    create: {
+      name: "Example Organization" + uuidv4(),
+      description: "An example organization for seeding purposes",
+    },
+  });
+
   // ─── Roles ─────────────────────────────────────────────────
   const adminRole = await prisma.role.upsert({
-    where: { name: "SUPER_ADMIN" },
+    where: {
+      id: uuidv4(),
+      name: "SUPER_ADMIN",
+      organizationId: organization.id,
+    },
     update: {},
     create: {
       name: "SUPER_ADMIN",
       description: "Full system access",
+      organizationId: organization.id,
       isSystem: true,
     },
   });
 
   const userRole = await prisma.role.upsert({
-    where: { name: "USER" },
+    where: { id: uuidv4(), name: "USER", organizationId: organization.id },
     update: {},
     create: {
       name: "USER",
       description: "Standard user access",
+      organizationId: organization.id,
       isSystem: true,
     },
   });
@@ -92,13 +112,15 @@ async function main(): Promise<void> {
   console.log(`✅ Created roles: SUPER_ADMIN, USER`);
 
   // ─── Admin User ────────────────────────────────────────────
-  const hashedPassword = await bcrypt.hash("Admin@123456", 12);
+  // const hashedPassword = await bcrypt.hash("Admin@123456", 12);
+  const hashedPassword = await bcrypt.hash("Qwerty123@", 12);
 
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@example.com" },
+    // where: { email: "admin@example.com" },
+    where: { email: "admin-org2@example.com" },
     update: {},
     create: {
-      email: "admin@example.com",
+      email: "admin-org2@example.com",
       name: "Super Admin",
       password: hashedPassword,
       status: "ACTIVE",
@@ -112,6 +134,19 @@ async function main(): Promise<void> {
     },
     update: {},
     create: { userId: adminUser.id, roleId: adminRole.id },
+  });
+
+  await prisma.userOrganization.upsert({
+    where: {
+      id: uuidv4(),
+      userId: adminUser.id,
+      organizationId: organization.id,
+    },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      organizationId: organization.id,
+    },
   });
 
   console.log(`✅ Created admin user: admin@example.com`);

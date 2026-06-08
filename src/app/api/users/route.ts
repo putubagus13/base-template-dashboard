@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     if (!hasPermission(authUser, "read:user")) {
       return ApiResponseBuilder.forbidden();
     }
+    const { id: orgId } = authUser.activeOrganization;
 
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, Number(searchParams.get("page") ?? "1"));
@@ -47,7 +48,10 @@ export async function GET(request: NextRequest) {
 
     const [users, total] = await prisma.$transaction([
       prisma.user.findMany({
-        where,
+        where: {
+          organizations: { some: { organizationId: orgId } },
+          ...where,
+        },
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },

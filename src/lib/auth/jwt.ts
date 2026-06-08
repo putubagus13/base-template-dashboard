@@ -5,6 +5,7 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import type { JwtPayload } from "@/types/auth";
+import { Organization } from "@/types";
 
 const getAccessTokenSecret = (): Uint8Array => {
   const secret = process.env.JWT_ACCESS_SECRET;
@@ -29,6 +30,7 @@ export async function generateAccessToken(
     name: payload.name,
     roles: payload.roles,
     permissions: payload.permissions,
+    activeOrganization: payload.activeOrganization,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.sub)
@@ -61,6 +63,7 @@ export async function verifyAccessToken(token: string): Promise<JwtPayload> {
     email: payload["email"] as string,
     name: payload["name"] as string,
     roles: payload["roles"] as string[],
+    activeOrganization: payload["activeOrganization"] as Organization,
     permissions: payload["permissions"] as string[],
     iat: payload.iat as number,
     exp: payload.exp as number,

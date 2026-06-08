@@ -4,6 +4,7 @@
 // ============================================================
 
 import { UserStatus } from "@prisma/client";
+import { Organization } from ".";
 
 /**
  * User object yang disimpan dalam session/JWT.
@@ -17,17 +18,19 @@ export type AuthUser = {
   status: UserStatus;
   roles: string[];
   permissions: string[]; // Format: "action:subject" e.g. "read:user"
+  activeOrganization: Organization;
 };
 
 /**
  * JWT payload yang di-encode dalam token.
  */
 export type JwtPayload = {
-  sub: string;    // userId
+  sub: string; // userId
   email: string;
   name: string;
   roles: string[];
   permissions: string[];
+  activeOrganization: Organization;
   iat: number;
   exp: number;
 };

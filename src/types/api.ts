@@ -63,7 +63,8 @@ export type ErrorCode =
   | "TOKEN_INVALID"
   | "ACCOUNT_INACTIVE"
   | "EMAIL_NOT_VERIFIED"
-  | "RATE_LIMIT_EXCEEDED";
+  | "RATE_LIMIT_EXCEEDED"
+  | "INVALID_ORGANIZATION";
 
 /**
  * Paginated response wrapper untuk list endpoints.
