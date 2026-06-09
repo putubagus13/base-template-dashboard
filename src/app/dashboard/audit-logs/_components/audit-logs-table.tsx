@@ -72,8 +72,8 @@ export function AuditLogsTable() {
   const meta = data?.meta as unknown as PaginationMeta | undefined;
 
   return (
-    <TableRoot>
-      <div className="flex items-center border-b border-slate-200 px-4 py-3">
+    <div>
+      <div className="flex items-center border-b border-slate-200 py-3">
         <SearchBar
           value={search}
           onChange={handleSearch}
@@ -81,92 +81,93 @@ export function AuditLogsTable() {
           className="max-w-sm w-full"
         />
       </div>
+      <TableRoot>
+        <TableHeader>
+          <TableRow>
+            <TableHead>User</TableHead>
+            <TableHead>Action</TableHead>
+            <TableHead>Subject</TableHead>
+            <TableHead>IP Address</TableHead>
+            <TableHead>Timestamp</TableHead>
+          </TableRow>
+        </TableHeader>
 
-      <TableHeader>
-        <TableRow>
-          <TableHead>User</TableHead>
-          <TableHead>Action</TableHead>
-          <TableHead>Subject</TableHead>
-          <TableHead>IP Address</TableHead>
-          <TableHead>Timestamp</TableHead>
-        </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        {isLoading ? (
-          <TableSkeleton colSpan={5} rows={10} />
-        ) : isError ? (
-          <TableEmpty colSpan={5} message="Failed to load audit logs." />
-        ) : !logs.length ? (
-          <TableEmpty
-            colSpan={5}
-            message={
-              search ? `No logs matching "${search}"` : "No audit logs found."
-            }
-            icon={<Activity className="h-10 w-10" />}
-          />
-        ) : (
-          logs.map((log) => (
-            <TableRow key={log.id}>
-              <TableCell>
-                {log.user ? (
-                  <div className="flex items-center gap-2">
-                    <Avatar name={log.user.name} size="xs" />
-                    <div>
-                      <p className="text-xs font-medium text-slate-800">
-                        {log.user.name}
-                      </p>
-                      <p className="text-[11px] text-slate-500">
-                        {log.user.email}
-                      </p>
+        <TableBody>
+          {isLoading ? (
+            <TableSkeleton colSpan={5} rows={10} />
+          ) : isError ? (
+            <TableEmpty colSpan={5} message="Failed to load audit logs." />
+          ) : !logs.length ? (
+            <TableEmpty
+              colSpan={5}
+              message={
+                search ? `No logs matching "${search}"` : "No audit logs found."
+              }
+              icon={<Activity className="h-10 w-10" />}
+            />
+          ) : (
+            logs.map((log) => (
+              <TableRow key={log.id}>
+                <TableCell>
+                  {log.user ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar name={log.user.name} size="xs" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-800">
+                          {log.user.name}
+                        </p>
+                        <p className="text-[11px] text-slate-500">
+                          {log.user.email}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <span className="text-xs text-slate-400">System</span>
-                )}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={ACTION_VARIANT[log.action] ?? "default"}
-                  className="text-[11px]"
-                >
-                  {log.action}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <span className="text-xs text-slate-700">{log.subject}</span>
-                {log.subjectId && (
-                  <span className="ml-1.5 font-mono text-[10px] text-slate-400">
-                    #{log.subjectId.slice(0, 8)}
+                  ) : (
+                    <span className="text-xs text-slate-400">System</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant={ACTION_VARIANT[log.action] ?? "default"}
+                    className="text-[11px]"
+                  >
+                    {log.action}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs text-slate-700">{log.subject}</span>
+                  {log.subjectId && (
+                    <span className="ml-1.5 font-mono text-[10px] text-slate-400">
+                      #{log.subjectId.slice(0, 8)}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span className="font-mono text-xs text-slate-500">
+                    {log.ipAddress ?? "—"}
                   </span>
-                )}
-              </TableCell>
-              <TableCell>
-                <span className="font-mono text-xs text-slate-500">
-                  {log.ipAddress ?? "—"}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="text-xs text-slate-500">
-                  {new Date(log.createdAt).toLocaleString("id-ID", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </TableCell>
-            </TableRow>
-          ))
-        )}
-      </TableBody>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs text-slate-500">
+                    {new Date(log.createdAt).toLocaleString("id-ID", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
 
-      {meta && (
-        <div className="border-t border-slate-200">
-          <Pagination meta={meta} onPageChange={setPage} />
-        </div>
-      )}
-    </TableRoot>
+        {meta && (
+          <div className="border-t border-slate-200">
+            <Pagination meta={meta} onPageChange={setPage} />
+          </div>
+        )}
+      </TableRoot>
+    </div>
   );
 }
