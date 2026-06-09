@@ -41,6 +41,7 @@ export const ROUTES = {
     profile: "/api/profile",
     changePassword: "/api/profile/change-password",
     auditLogs: "/api/audit-logs",
+    member: "/api/members",
   },
 } as const;
 

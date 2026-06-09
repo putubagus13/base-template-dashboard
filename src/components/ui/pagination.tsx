@@ -25,7 +25,11 @@ export function Pagination({ meta, onPageChange, className }: PaginationProps) {
     }
     const pages: (number | "...")[] = [1];
     if (page > 3) pages.push("...");
-    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+    for (
+      let i = Math.max(2, page - 1);
+      i <= Math.min(totalPages - 1, page + 1);
+      i++
+    ) {
       pages.push(i);
     }
     if (page < totalPages - 2) pages.push("...");
@@ -34,13 +38,18 @@ export function Pagination({ meta, onPageChange, className }: PaginationProps) {
   };
 
   return (
-    <div className={cn("flex items-center justify-between gap-4 px-4 py-3", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between gap-4 px-4 py-3",
+        className
+      )}
+    >
       <p className="text-sm text-slate-500">
-        Showing{" "}
+        Menampilkan{" "}
         <span className="font-medium text-slate-700">
           {from}–{to}
         </span>{" "}
-        of <span className="font-medium text-slate-700">{total}</span> results
+        dari <span className="font-medium text-slate-700">{total}</span> hasil
       </p>
 
       <div className="flex items-center gap-1">
@@ -56,7 +65,10 @@ export function Pagination({ meta, onPageChange, className }: PaginationProps) {
 
         {getPageNumbers().map((p, i) =>
           p === "..." ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-slate-400 select-none">
+            <span
+              key={`ellipsis-${i}`}
+              className="px-2 text-slate-400 select-none"
+            >
               …
             </span>
           ) : (

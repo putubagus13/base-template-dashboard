@@ -79,13 +79,13 @@ export function useCreateUser() {
       apiClient.post<UserListItem>("/api/users", payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success("User created successfully.");
+      toast.success("Pengguna berhasil dibuat.");
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to create user.");
+        toast.error("Gagal membuat pengguna.");
       }
     },
   });
@@ -103,13 +103,13 @@ export function useUpdateUser(id: string) {
       if (response.data) {
         queryClient.setQueryData(userKeys.detail(id), response);
       }
-      toast.success("User updated successfully.");
+      toast.success("Pengguna berhasil diperbarui.");
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to update user.");
+        toast.error("Gagal memperbarui pengguna.");
       }
     },
   });
@@ -122,13 +122,13 @@ export function useDeleteUser() {
     mutationFn: (id: string) => apiClient.delete(`/api/users/${id}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success("User deleted successfully.");
+      toast.success("Pengguna berhasil dihapus.");
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to delete user.");
+        toast.error("Gagal menghapus pengguna.");
       }
     },
   });

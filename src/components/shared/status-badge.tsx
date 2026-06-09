@@ -18,6 +18,14 @@ const STATUS_CONFIG: Record<
   PENDING_VERIFICATION: { variant: "warning", label: "Pending" },
 };
 
+const STATUS_MEMBER_CONFIG: Record<
+  string,
+  { variant: BadgeProps["variant"]; label: string }
+> = {
+  active: { variant: "success", label: "Active" },
+  inactive: { variant: "secondary", label: "Inactive" },
+};
+
 type StatusBadgeProps = {
   status: UserStatus;
   className?: string | undefined;
@@ -25,6 +33,26 @@ type StatusBadgeProps = {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const config = STATUS_CONFIG[status] ?? {
+    variant: "secondary" as const,
+    label: status,
+  };
+  return (
+    <Badge variant={config.variant} className={className}>
+      {config.label}
+    </Badge>
+  );
+}
+
+type StatusBadgeMemberProps = {
+  status: boolean;
+  className?: string | undefined;
+};
+
+export function StatusBadgeMember({
+  status,
+  className,
+}: StatusBadgeMemberProps) {
+  const config = STATUS_MEMBER_CONFIG[status ? "active" : "inactive"] ?? {
     variant: "secondary" as const,
     label: status,
   };

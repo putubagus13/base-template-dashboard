@@ -54,7 +54,7 @@ export function Navbar() {
             <div className="absolute right-0 top-full z-20 mt-1 w-52 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
               <div className="border-b border-slate-100 px-4 py-2.5">
                 <p className="text-xs font-medium text-slate-500">
-                  Signed in as
+                  Masuk sebagai
                 </p>
                 <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                   {user?.email}

@@ -10,8 +10,8 @@ import { requireAuthUser, hashPassword } from "@/lib/auth/helpers";
 import { hasPermission } from "@/lib/auth/rbac";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { z } from "zod";
-import { PaginationMeta } from "@/types";
 import { writeAuditLog } from "@/lib/audit";
+import { generateMetadataPagination } from "@/utils/metadata-pagination-generator";
 
 const createUserSchema = z.object({
   name: z.string().min(2).max(100),
@@ -74,23 +74,12 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
-
     const formattedUsers = users.map((u) => ({
       ...u,
       roles: u.roles.map((ur) => ur.role),
     }));
 
-    const metadata: PaginationMeta = {
-      page,
-      limit,
-      total,
-      totalPages,
-      hasNextPage,
-      hasPrevPage,
-    };
+    const metadata = generateMetadataPagination(page, limit, total);
 
     return ApiResponseBuilder.success(
       formattedUsers,

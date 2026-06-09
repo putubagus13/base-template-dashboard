@@ -16,7 +16,7 @@ export default async function AuditLogsPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Audit Logs</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Track all system activity and user actions.
+          Lacak semua aktivitas sistem dan tindakan pengguna.
         </p>
       </div>
       <AuditLogsTable />

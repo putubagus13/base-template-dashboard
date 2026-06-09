@@ -8,6 +8,8 @@ import { apiClient, ApiError } from "@/lib/api-client";
 import { useAuthStore } from "@/store/auth.store";
 import type { AuthUser } from "@/types/auth";
 import { UserStatus } from "@prisma/client";
+import { useGlobalShareStore } from "@/store/global-share.store";
+import { useMemberStatusType } from "@/hooks";
 
 type ProfileResponse = {
   id: string;
@@ -51,6 +53,7 @@ function mapToAuthUser(data: ProfileResponse): AuthUser {
 function UserProviderInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
+  const { setMemberStatusType } = useGlobalShareStore();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: profileQueryKey,
@@ -64,6 +67,8 @@ function UserProviderInner({ children }: { children: React.ReactNode }) {
       return failureCount < 2;
     },
   });
+
+  const { data: memberStatusTypeData } = useMemberStatusType();
 
   // Redirect to login on 401
   useEffect(() => {
@@ -84,6 +89,13 @@ function UserProviderInner({ children }: { children: React.ReactNode }) {
       setUser(authUser);
     }
   }, [data, setUser]);
+
+  // Sync fetched member status type into Zustand store
+  useEffect(() => {
+    if (memberStatusTypeData) {
+      setMemberStatusType(memberStatusTypeData.data || []);
+    }
+  }, [memberStatusTypeData, setMemberStatusType]);
 
   if (isLoading && !user) {
     return (

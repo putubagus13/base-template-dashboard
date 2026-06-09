@@ -10,4 +10,4 @@ export { FilterBar } from "./filter-bar";
 export { PageHeader } from "./page-header";
 export { PermissionGuard } from "./permission-guard";
 export { SearchBar } from "./search-bar";
-export { StatusBadge } from "./status-badge";
+export { StatusBadge, StatusBadgeMember } from "./status-badge";

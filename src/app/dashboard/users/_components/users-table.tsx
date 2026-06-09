@@ -67,29 +67,41 @@ export function UsersTable() {
 
   return (
     <>
-      <TableRoot>
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3">
-          <SearchBar
-            value={search}
-            onChange={handleSearch}
-            placeholder="Search by name or email..."
-            className="max-w-xs w-full"
-          />
-          <PermissionGuard permission="create:user">
-            <Button size="sm" onClick={openCreate}>
-              <Plus className="h-4 w-4" />
-              Add User
-            </Button>
-          </PermissionGuard>
-        </div>
+      <div className="flex w-full items-center justify-between gap-4 border-b border-slate-200 py-3">
+        <SearchBar
+          value={search}
+          onChange={handleSearch}
+          // placeholder="Search by name or email..."
+          // placeholder="Cari berdasarkan nama atau email..."
+          className="max-w-xs w-full"
+        />
+        <PermissionGuard permission="create:user">
+          <Button size="sm" onClick={openCreate}>
+            <Plus className="h-4 w-4" />
+            Tambah Pengguna
+          </Button>
+        </PermissionGuard>
+      </div>
 
+      <TableRoot
+        pagination={
+          data?.meta && (
+            <div className="border-t border-slate-200">
+              <Pagination
+                meta={data.meta as PaginationMeta}
+                onPageChange={setPage}
+              />
+            </div>
+          )
+        }
+      >
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Roles</TableHead>
+            <TableHead>Nama Pengguna</TableHead>
+            <TableHead>Peran</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Last Login</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Terakhir Login</TableHead>
+            <TableHead className="text-right">Tindakan</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -176,15 +188,6 @@ export function UsersTable() {
             ))
           )}
         </TableBody>
-
-        {data?.meta && (
-          <div className="border-t border-slate-200">
-            <Pagination
-              meta={data.meta as PaginationMeta}
-              onPageChange={setPage}
-            />
-          </div>
-        )}
       </TableRoot>
 
       <UserFormDialog
@@ -197,11 +200,11 @@ export function UsersTable() {
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete User"
-        description={`Delete "${
+        title="Hapus Pengguna"
+        description={`Apakah Anda yakin ingin menghapus pengguna "${
           deleteTarget?.name ?? ""
-        }"? This cannot be undone.`}
-        confirmLabel="Delete User"
+        }"? Ini tidak dapat dikembalikan.`}
+        confirmLabel="Hapus Pengguna"
         isLoading={deleteUser.isPending}
       />
     </>

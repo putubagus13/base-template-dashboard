@@ -16,7 +16,7 @@ type SearchBarProps = {
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Search...",
+  placeholder = "Cari...",
   debounceMs = 400,
   className,
 }: SearchBarProps) {

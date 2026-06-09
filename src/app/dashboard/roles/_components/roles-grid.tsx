@@ -72,7 +72,7 @@ export function RolesGrid() {
           <PermissionGuard permission="create:role">
             <Button size="sm" onClick={openCreate}>
               <Plus className="h-4 w-4" />
-              Create Role
+              Buat Peran
             </Button>
           </PermissionGuard>
         </div>
@@ -104,7 +104,7 @@ export function RolesGrid() {
                       )}
                     </div>
                     <p className="text-xs text-slate-500">
-                      {role.userCount} user{role.userCount !== 1 ? "s" : ""}
+                      {role.userCount} pengguna
                     </p>
                   </div>
                 </div>
@@ -146,11 +146,11 @@ export function RolesGrid() {
 
               <div className="mt-4">
                 <p className="mb-2 text-xs font-medium text-slate-500">
-                  Permissions ({role.permissions.length})
+                  Izin ({role.permissions.length})
                 </p>
                 {role.permissions.length === 0 ? (
                   <p className="text-xs text-slate-400">
-                    No permissions assigned
+                    Tidak ada izin yang dialami pengguna ini
                   </p>
                 ) : (
                   <div className="flex flex-wrap gap-1">
@@ -178,7 +178,10 @@ export function RolesGrid() {
 
       <RoleFormDialog
         open={formOpen}
-        onClose={() => setFormOpen(false)}
+        onClose={() => {
+          setEditRole(undefined);
+          setFormOpen(false);
+        }}
         role={editRole}
       />
 
@@ -186,11 +189,11 @@ export function RolesGrid() {
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Role"
-        description={`Delete role "${
+        title="Hapus Peran"
+        description={`Apakah Anda yakin ingin menghapus peran "${
           deleteTarget?.name ?? ""
-        }"? Users assigned this role will lose its permissions. This action cannot be undone.`}
-        confirmLabel="Delete Role"
+        }"? Pengguna yang dialami peran ini akan kehilangan izin yang dialaminya. Tindakan ini tidak dapat diundo.`}
+        confirmLabel="Hapus Peran"
         isLoading={deleteRole.isPending}
       />
     </>

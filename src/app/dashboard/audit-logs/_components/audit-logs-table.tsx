@@ -77,18 +77,26 @@ export function AuditLogsTable() {
         <SearchBar
           value={search}
           onChange={handleSearch}
-          placeholder="Search action, subject, or user..."
+          placeholder="Cari tindakan, subjek, atau pengguna..."
           className="max-w-sm w-full"
         />
       </div>
-      <TableRoot>
+      <TableRoot
+        pagination={
+          meta && (
+            <div className="border-t border-slate-200">
+              <Pagination meta={meta} onPageChange={setPage} />
+            </div>
+          )
+        }
+      >
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead>Action</TableHead>
-            <TableHead>Subject</TableHead>
-            <TableHead>IP Address</TableHead>
-            <TableHead>Timestamp</TableHead>
+            <TableHead>Tindakan</TableHead>
+            <TableHead>Subjek</TableHead>
+            <TableHead>Alamat IP</TableHead>
+            <TableHead>Waktu Stempel</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -161,12 +169,6 @@ export function AuditLogsTable() {
             ))
           )}
         </TableBody>
-
-        {meta && (
-          <div className="border-t border-slate-200">
-            <Pagination meta={meta} onPageChange={setPage} />
-          </div>
-        )}
       </TableRoot>
     </div>
   );

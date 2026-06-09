@@ -38,6 +38,12 @@ enum OrganizationStatus {
   SUSPENDED
 }
 
+enum GenderType {
+  MALE
+  FEMALE
+  OTHER
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -195,8 +201,12 @@ model Organization {
   deletedAt   DateTime?
 
   // Relations
-  users       UserOrganization[]
-  roles       Role[]
+  users         UserOrganization[]
+  roles         Role[]
+  cashAccounts  CashAccount[]
+  members       Member[]
+  memberStatusTypes MemberStatusType[]
+
   @@index([name])
   @@map("organization")
 }
@@ -219,4 +229,79 @@ model UserOrganization {
 
   @@unique([organizationId, userId])
   @@map("user_organization")
+}
+
+model CashAccount {
+  id                String   @id @default(uuid())
+  name              String
+  description       String?
+  organizationId    String
+  balance           Float    @default(0)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  createdBy         String?
+  updatedBy         String?
+  deletedAt         DateTime?
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([name])
+  @@index([name, organizationId])
+  @@map("cash_accounts")
+}
+
+model MemberStatusType {
+  id              String   @id @default(uuid())
+  organizationId  String
+  name            String
+  description     String?
+  color           String?
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members         Member[]
+
+  @@index([name])
+  @@map("member_status_types")
+}
+
+model Member {
+  id              String   @id @default(uuid())
+  organizationId  String
+  memberNumber    String
+  fullName        String
+  dateOfBirth     DateTime?
+  gender          GenderType
+  address         String?
+  phone           String?
+  email           String?
+  statusId        String?
+  position        String?
+  joinDate        DateTime?
+  isActive        Boolean  @default(true)
+  activityPoint   Int      @default(0)
+  photoUrl        String?
+  occupation      String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  status          MemberStatusType? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([statusId])
+  @@index([organizationId, statusId])
+  @@map("members")
 }

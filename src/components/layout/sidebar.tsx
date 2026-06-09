@@ -36,13 +36,19 @@ const NAV_ITEMS: NavItem[] = [
     permission: "read:dashboard",
   },
   {
-    label: "Users",
+    label: "Anggota Organisasi",
+    href: "/dashboard/member",
+    icon: Users,
+    permission: "read:member",
+  },
+  {
+    label: "Pengguna",
     href: "/dashboard/users",
     icon: Users,
     permission: "read:user",
   },
   {
-    label: "Roles & Permissions",
+    label: "Peran & Izin",
     href: "/dashboard/roles",
     icon: Shield,
     permission: "read:role",
@@ -58,7 +64,7 @@ const NAV_ITEMS: NavItem[] = [
 const BOTTOM_ITEMS: NavItem[] = [
   { label: "Profile", href: "/dashboard/profile", icon: User },
   {
-    label: "Settings",
+    label: "Pengaturan",
     href: "/dashboard/settings",
     icon: Settings,
     adminOnly: true,

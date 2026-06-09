@@ -9,4 +9,10 @@ export {
   formatPermission,
   getInitials,
 } from "./format";
-export { getErrorMessage, setServerErrors, isAuthError, isNotFoundError } from "./error";
+export {
+  getErrorMessage,
+  setServerErrors,
+  isAuthError,
+  isNotFoundError,
+} from "./error";
+export { generateMetadataPagination } from "./metadata-pagination-generator";

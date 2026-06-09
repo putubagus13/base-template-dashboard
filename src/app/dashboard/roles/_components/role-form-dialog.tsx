@@ -96,7 +96,11 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
   };
 
   const handleClose = () => {
-    reset();
+    reset({
+      name: "",
+      permissionIds: [],
+      description: "",
+    });
     onClose();
   };
 
@@ -125,14 +129,14 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
     <Dialog
       open={open}
       onClose={handleClose}
-      title={isEditing ? "Edit Role" : "Create Role"}
-      description="Configure role name and assign permissions."
+      title={isEditing ? "Edit Peran" : "Buat Peran"}
+      description="Konfigurasi nama peran dan izin yang dialaminya."
       size="lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <div className="grid grid-cols-2 gap-4">
           <FormField
-            label="Role name"
+            label="Nama Peran"
             htmlFor="role-name"
             error={errors.name?.message}
             required
@@ -147,7 +151,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
             />
           </FormField>
           <FormField
-            label="Description"
+            label="Deskripsi"
             htmlFor="role-desc"
             error={errors.description?.message}
           >
@@ -163,7 +167,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
         {/* Permissions Matrix */}
         <div>
           <p className="mb-2 text-sm font-medium text-slate-700">
-            Permissions
+            Izin
             <span className="ml-1.5 text-xs font-normal text-slate-500">
               ({selectedPermIds.length} selected)
             </span>
@@ -233,7 +237,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
             Cancel
           </Button>
           <Button type="submit" isLoading={isPending}>
-            {isEditing ? "Save Changes" : "Create Role"}
+            {isEditing ? "Simpan Perubahan" : "Buat Peran"}
           </Button>
         </DialogFooter>
       </form>

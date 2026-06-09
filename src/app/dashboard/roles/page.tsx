@@ -17,9 +17,9 @@ export default async function RolesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Roles & Permissions</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Peran & Izin</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Manage system roles and assign permissions dynamically.
+          Kelola peran sistem dan tetapkan izin secara dinamis.
         </p>
       </div>
       <RolesGrid />

@@ -150,6 +150,58 @@ async function main(): Promise<void> {
   });
 
   console.log(`✅ Created admin user: admin@example.com`);
+
+  // ─── Member Status Types ─────────────────────────────────────
+  const memberStatusTypes = [
+    {
+      name: "Anggota Biasa",
+      description: "Anggota reguler organisasi",
+      color: "#16a34a",
+    },
+    {
+      name: "Pengurus",
+      description: "Pengurus inti organisasi",
+      color: "#dc2626",
+    },
+    {
+      name: "Calon Anggota",
+      description: "Anggota yang sedang dalam masa uji",
+      color: "#6b7280",
+    },
+    {
+      name: "Anggota Kehormatan",
+      description: "Anggota dengan kontribusi istimewa",
+      color: "#d97706",
+    },
+    {
+      name: "Anggota Aktif",
+      description: "Anggota dengan keaktifan tinggi",
+      color: "#2563eb",
+    },
+  ];
+
+  await Promise.all(
+    memberStatusTypes.map((status) =>
+      prisma.memberStatusType.upsert({
+        where: {
+          id: uuidv4(),
+          name: status.name,
+        },
+        update: {
+          description: status.description,
+          color: status.color,
+        },
+        create: {
+          name: status.name,
+          organizationId: organization.id,
+          description: status.description,
+          color: status.color,
+        },
+      })
+    )
+  );
+
+  console.log(`✅ Created ${memberStatusTypes.length} member status types`);
   console.log("✨ Seeding completed!");
 }
 

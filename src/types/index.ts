@@ -36,3 +36,4 @@ export type {
   UpdateUserPayload,
 } from "./user";
 export type { Organization, UserOrganization } from "./organization";
+export type { ListMemberQueryParam } from "./member";
