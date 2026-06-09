@@ -50,7 +50,7 @@ export function SearchBar({
         placeholder={placeholder}
         className={cn(
           "h-9 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-8 text-sm text-slate-900 placeholder:text-slate-400",
-          "focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
+          "focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
           "transition-colors duration-150"
         )}
       />

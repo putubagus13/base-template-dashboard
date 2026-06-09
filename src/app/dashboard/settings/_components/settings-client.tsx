@@ -144,21 +144,29 @@ export function SettingsClient() {
   return (
     <div className="max-w-2xl space-y-6">
       <Alert variant="info">
-        Settings values marked as <strong>Coming Soon</strong> are static placeholders.
-        Connect them to your database or environment variables to make them dynamic.
+        Settings values marked as <strong>Coming Soon</strong> are static
+        placeholders. Connect them to your database or environment variables to
+        make them dynamic.
       </Alert>
 
       {SETTING_SECTIONS.map((section) => (
-        <div key={section.id} className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div
+          key={section.id}
+          className="rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
           <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50">
-              <section.icon className="h-4 w-4 text-indigo-600" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50">
+              <section.icon className="h-4 w-4 text-brand-600" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-slate-900">{section.title}</h2>
+                <h2 className="text-base font-semibold text-slate-900">
+                  {section.title}
+                </h2>
                 {section.badge && (
-                  <Badge variant="warning" className="text-[10px]">{section.badge}</Badge>
+                  <Badge variant="warning" className="text-[10px]">
+                    {section.badge}
+                  </Badge>
                 )}
               </div>
               <p className="text-xs text-slate-500">{section.description}</p>
@@ -167,9 +175,14 @@ export function SettingsClient() {
 
           <div className="divide-y divide-slate-100">
             {section.items.map((item, i) => (
-              <div key={i} className="flex items-center justify-between gap-4 px-6 py-4">
+              <div
+                key={i}
+                className="flex items-center justify-between gap-4 px-6 py-4"
+              >
                 <div>
-                  <p className="text-sm font-medium text-slate-800">{item.label}</p>
+                  <p className="text-sm font-medium text-slate-800">
+                    {item.label}
+                  </p>
                   <p className="text-xs text-slate-500">{item.description}</p>
                 </div>
 
@@ -179,7 +192,7 @@ export function SettingsClient() {
                     aria-checked={Boolean(item.value)}
                     disabled={item.disabled}
                     className={`relative h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors
-                      ${item.value ? "bg-indigo-600" : "bg-slate-200"}
+                      ${item.value ? "bg-brand-600" : "bg-slate-200"}
                       disabled:cursor-not-allowed disabled:opacity-50`}
                   >
                     <span

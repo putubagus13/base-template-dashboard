@@ -7,7 +7,7 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-indigo-100 text-indigo-700",
+        default: "bg-brand-100 text-brand-700",
         success: "bg-emerald-100 text-emerald-700",
         warning: "bg-amber-100 text-amber-700",
         destructive: "bg-red-100 text-red-700",
@@ -23,7 +23,9 @@ export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> &
   VariantProps<typeof badgeVariants>;
 
 export function Badge({ className, variant, ...props }: BadgeProps) {
-  return <span className={cn(badgeVariants({ variant }), className)} {...props} />;
+  return (
+    <span className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
 }
 
 // ─── Card ─────────────────────────────────────────────────────
@@ -51,7 +53,10 @@ export function CardHeader({ className, ...props }: CardProps) {
   );
 }
 
-export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+export function CardTitle({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
       className={cn("text-lg font-semibold text-slate-900", className)}
@@ -60,10 +65,11 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
   );
 }
 
-export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("text-sm text-slate-500", className)} {...props} />
-  );
+export function CardDescription({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <p className={cn("text-sm text-slate-500", className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: CardProps) {
@@ -84,12 +90,19 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
   const sizeMap = { sm: "h-4 w-4", md: "h-6 w-6", lg: "h-8 w-8" };
   return (
     <svg
-      className={cn("animate-spin text-indigo-600", sizeMap[size], className)}
+      className={cn("animate-spin text-brand-600", sizeMap[size], className)}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
       <path
         className="opacity-75"
         fill="currentColor"

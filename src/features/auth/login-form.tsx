@@ -83,14 +83,14 @@ export function LoginForm() {
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             {...register("rememberMe")}
           />
           Remember me
         </label>
         <Link
           href="/auth/forgot-password"
-          className="text-sm text-indigo-600 hover:text-indigo-500 hover:underline"
+          className="text-sm text-brand-600 hover:text-brand-500 hover:underline"
         >
           Forgot password?
         </Link>
@@ -104,7 +104,7 @@ export function LoginForm() {
         Don&apos;t have an account?{" "}
         <Link
           href="/auth/register"
-          className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline"
+          className="font-medium text-brand-600 hover:text-brand-500 hover:underline"
         >
           Create one
         </Link>

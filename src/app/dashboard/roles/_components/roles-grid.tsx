@@ -29,7 +29,10 @@ export function RolesGrid() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editRole, setEditRole] = useState<RoleItem | undefined>(undefined);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const openCreate = () => {
     setEditRole(undefined);
@@ -43,20 +46,24 @@ export function RolesGrid() {
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return;
-    deleteRole.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
+    deleteRole.mutate(deleteTarget.id, {
+      onSuccess: () => setDeleteTarget(null),
+    });
   };
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center py-24">
-      <Spinner size="lg" />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Spinner size="lg" />
+      </div>
+    );
 
-  if (isError) return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
-      Failed to load roles. Please refresh the page.
-    </div>
-  );
+  if (isError)
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
+        Failed to load roles. Please refresh the page.
+      </div>
+    );
 
   return (
     <>
@@ -72,21 +79,28 @@ export function RolesGrid() {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {data?.data?.map((role) => (
-            <div key={role.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+            <div
+              key={role.id}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50">
                     {role.isSystem ? (
-                      <Lock className="h-4 w-4 text-indigo-600" />
+                      <Lock className="h-4 w-4 text-brand-600" />
                     ) : (
-                      <Users className="h-4 w-4 text-indigo-600" />
+                      <Users className="h-4 w-4 text-brand-600" />
                     )}
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <p className="font-semibold text-slate-900">{role.name}</p>
+                      <p className="font-semibold text-slate-900">
+                        {role.name}
+                      </p>
                       {role.isSystem && (
-                        <Badge variant="secondary" className="text-[10px]">System</Badge>
+                        <Badge variant="secondary" className="text-[10px]">
+                          System
+                        </Badge>
                       )}
                     </div>
                     <p className="text-xs text-slate-500">
@@ -98,15 +112,23 @@ export function RolesGrid() {
                 {!role.isSystem && (
                   <div className="flex items-center gap-1">
                     {can("update:role") && (
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(role)} aria-label="Edit role">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEdit(role)}
+                        aria-label="Edit role"
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
                     )}
                     {can("delete:role") && (
                       <Button
-                        variant="ghost" size="icon"
+                        variant="ghost"
+                        size="icon"
                         className="text-red-400 hover:bg-red-50 hover:text-red-600"
-                        onClick={() => setDeleteTarget({ id: role.id, name: role.name })}
+                        onClick={() =>
+                          setDeleteTarget({ id: role.id, name: role.name })
+                        }
                         aria-label="Delete role"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -117,7 +139,9 @@ export function RolesGrid() {
               </div>
 
               {role.description && (
-                <p className="mt-3 text-xs text-slate-500 line-clamp-2">{role.description}</p>
+                <p className="mt-3 text-xs text-slate-500 line-clamp-2">
+                  {role.description}
+                </p>
               )}
 
               <div className="mt-4">
@@ -125,11 +149,17 @@ export function RolesGrid() {
                   Permissions ({role.permissions.length})
                 </p>
                 {role.permissions.length === 0 ? (
-                  <p className="text-xs text-slate-400">No permissions assigned</p>
+                  <p className="text-xs text-slate-400">
+                    No permissions assigned
+                  </p>
                 ) : (
                   <div className="flex flex-wrap gap-1">
                     {role.permissions.slice(0, 6).map((perm) => (
-                      <Badge key={perm.id} variant="outline" className="text-[10px]">
+                      <Badge
+                        key={perm.id}
+                        variant="outline"
+                        className="text-[10px]"
+                      >
                         {perm.action}:{perm.subject}
                       </Badge>
                     ))}
@@ -146,14 +176,20 @@ export function RolesGrid() {
         </div>
       </div>
 
-      <RoleFormDialog open={formOpen} onClose={() => setFormOpen(false)} role={editRole} />
+      <RoleFormDialog
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        role={editRole}
+      />
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
         title="Delete Role"
-        description={`Delete role "${deleteTarget?.name ?? ""}"? Users assigned this role will lose its permissions. This action cannot be undone.`}
+        description={`Delete role "${
+          deleteTarget?.name ?? ""
+        }"? Users assigned this role will lose its permissions. This action cannot be undone.`}
         confirmLabel="Delete Role"
         isLoading={deleteRole.isPending}
       />

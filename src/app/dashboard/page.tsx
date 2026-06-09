@@ -74,8 +74,8 @@ export default async function DashboardPage() {
           label="Total Users"
           value={stats.totalUsers}
           icon={Users}
-          iconColor="text-indigo-600"
-          iconBg="bg-indigo-50"
+          iconColor="text-brand-600"
+          iconBg="bg-brand-50"
         />
         <StatCard
           label="Active Users"
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
                   key={log.id}
                   className="flex items-start gap-3 px-6 py-3.5"
                 >
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-semibold text-indigo-600">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600">
                     {log.user?.name?.charAt(0).toUpperCase() ?? "?"}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -155,8 +155,8 @@ export default async function DashboardPage() {
                 label: "Manage Users",
                 href: "/dashboard/users",
                 icon: Users,
-                color: "text-indigo-600",
-                bg: "bg-indigo-50",
+                color: "text-brand-600",
+                bg: "bg-brand-50",
               },
               {
                 label: "Manage Roles",
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
               <a
                 key={action.href}
                 href={action.href}
-                className="group flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/30 hover:shadow-sm"
+                className="group flex items-center gap-3 rounded-xl border border-slate-200 p-4 transition-all hover:border-brand-200 hover:bg-brand-50/30 hover:shadow-sm"
               >
                 <div
                   className={`rounded-lg p-2 ${action.bg} transition-colors group-hover:bg-white`}

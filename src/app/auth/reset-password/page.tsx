@@ -40,7 +40,7 @@ export default async function ResetPasswordPage({
         </p>
         <Link
           href="/auth/forgot-password"
-          className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:underline"
+          className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline"
         >
           Request a new link
         </Link>

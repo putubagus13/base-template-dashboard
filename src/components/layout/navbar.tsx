@@ -12,12 +12,13 @@ export function Navbar() {
   const logout = useLogout();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const initials = user?.name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() ?? "??";
+  const initials =
+    user?.name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() ?? "??";
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
@@ -29,7 +30,7 @@ export function Navbar() {
           onClick={() => setDropdownOpen((v) => !v)}
           className="flex items-center gap-3 rounded-lg px-3 py-1.5 transition-colors hover:bg-slate-50"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white">
             {initials}
           </div>
           <div className="hidden text-left sm:block">
@@ -52,7 +53,9 @@ export function Navbar() {
             />
             <div className="absolute right-0 top-full z-20 mt-1 w-52 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
               <div className="border-b border-slate-100 px-4 py-2.5">
-                <p className="text-xs font-medium text-slate-500">Signed in as</p>
+                <p className="text-xs font-medium text-slate-500">
+                  Signed in as
+                </p>
                 <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                   {user?.email}
                 </p>

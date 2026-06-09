@@ -15,6 +15,8 @@ import {
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
 import type { PermissionString } from "@/types/rbac";
+import { STT_TGD_LOGO } from "../../../public";
+import Image from "next/image";
 
 type NavItem = {
   label: string;
@@ -86,7 +88,7 @@ export function Sidebar() {
           className={cn(
             "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
             isActive(item.href)
-              ? "bg-indigo-50 text-indigo-700"
+              ? "bg-brand-50 text-brand-700"
               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
           )}
         >
@@ -94,13 +96,13 @@ export function Sidebar() {
             className={cn(
               "h-4 w-4 shrink-0 transition-colors",
               isActive(item.href)
-                ? "text-indigo-600"
+                ? "text-brand-600"
                 : "text-slate-400 group-hover:text-slate-600"
             )}
           />
           <span className="flex-1">{item.label}</span>
           {isActive(item.href) && (
-            <ChevronRight className="h-3.5 w-3.5 text-indigo-400" />
+            <ChevronRight className="h-3.5 w-3.5 text-brand-400" />
           )}
         </Link>
       </li>
@@ -112,12 +114,27 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 shadow-sm shadow-indigo-600/30">
+          {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 shadow-sm shadow-brand-600/30">
             <span className="text-sm font-bold text-white">D</span>
+          </div> */}
+          <div className="w-9 h-9 flex items-center justify-center shrink-0">
+            {/* <span className="text-xs font-display font-bold text-white">S</span> */}
+            <Image
+              src={STT_TGD_LOGO.src}
+              alt="Logo"
+              className="object-contain"
+              width={40}
+              height={40}
+            />
           </div>
-          <span className="text-lg font-semibold text-slate-900">
-            Dashboard
-          </span>
+          <div>
+            <span className="text-sm font-semibold text-slate-900 line-clamp-1">
+              STT Tunas Guna Dharma
+            </span>
+            <span className="text-xs font-medium text-slate-400 line-clamp-1">
+              Dashboard
+            </span>
+          </div>
         </div>
       </div>
 

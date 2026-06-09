@@ -34,8 +34,20 @@ export function Avatar({ name, src, size = "md", className }: AvatarProps) {
 
   if (src) {
     return (
-      <div className={cn("relative shrink-0 overflow-hidden rounded-full", wrapper, className)}>
-        <Image src={src} alt={name} fill className="object-cover" sizes="64px" />
+      <div
+        className={cn(
+          "relative shrink-0 overflow-hidden rounded-full",
+          wrapper,
+          className
+        )}
+      >
+        <Image
+          src={src}
+          alt={name}
+          fill
+          className="object-cover"
+          sizes="64px"
+        />
       </div>
     );
   }
@@ -43,7 +55,7 @@ export function Avatar({ name, src, size = "md", className }: AvatarProps) {
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-700 select-none",
+        "flex shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700 select-none",
         wrapper,
         text,
         className

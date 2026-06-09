@@ -17,14 +17,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 shadow-sm",
+          "bg-brand-500 text-white hover:bg-brand-700 focus-visible:ring-brand-500 shadow-sm",
         destructive:
           "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 shadow-sm",
         outline:
-          "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-indigo-500",
+          "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-brand-500",
         ghost:
-          "text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-indigo-500",
-        link: "text-indigo-600 underline-offset-4 hover:underline focus-visible:ring-indigo-500",
+          "text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-brand-500",
+        link: "text-brand-600 underline-offset-4 hover:underline focus-visible:ring-brand-500",
       },
       size: {
         sm: "h-8 px-3 text-xs",
@@ -46,7 +46,10 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, isLoading, children, disabled, ...props }, ref) => {
+  (
+    { className, variant, size, isLoading, children, disabled, ...props },
+    ref
+  ) => {
     return (
       <button
         ref={ref}

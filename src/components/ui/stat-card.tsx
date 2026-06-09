@@ -28,8 +28,8 @@ export function StatCard({
   label,
   value,
   icon: Icon,
-  iconColor = "text-indigo-600",
-  iconBg = "bg-indigo-50",
+  iconColor = "text-brand-600",
+  iconBg = "bg-brand-50",
   trend,
   className,
 }: StatCardProps) {

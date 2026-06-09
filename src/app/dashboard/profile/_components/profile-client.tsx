@@ -184,7 +184,7 @@ function ProfileInfoSection() {
       {user.roles.length > 0 && (
         <div className="border-t border-slate-200 px-6 py-5">
           <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Shield className="h-4 w-4 text-indigo-500" />
+            <Shield className="h-4 w-4 text-brand-500" />
             Permissions
           </h3>
           <div className="flex flex-wrap gap-1.5">

@@ -200,7 +200,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
                             el.indeterminate = someSelected && !allSelected;
                         }}
                         onChange={() => toggleSubjectAll(permIds)}
-                        className="h-3.5 w-3.5 cursor-pointer rounded border-slate-300 accent-indigo-600"
+                        className="h-3.5 w-3.5 cursor-pointer rounded border-slate-300 accent-brand-600"
                       />
                       <label
                         htmlFor={`subject-${subject}`}

@@ -36,7 +36,7 @@ export function RegisterForm() {
   if (!roleId) router.push("/auth/login");
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <FormField
         label="Full name"
         htmlFor="name"
@@ -140,7 +140,7 @@ export function RegisterForm() {
         Already have an account?{" "}
         <Link
           href="/auth/login"
-          className="font-medium text-indigo-600 hover:underline"
+          className="font-medium text-brand-600 hover:underline"
         >
           Sign in
         </Link>
