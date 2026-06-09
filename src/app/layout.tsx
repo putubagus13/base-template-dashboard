@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import { Providers } from "./providers";
+import { Providers } from "../provider/react-query-providers";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,7 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} h-full bg-slate-50 text-slate-900 antialiased`}>
+      <body
+        className={`${inter.className} h-full bg-slate-50 text-slate-900 antialiased`}
+      >
         <Providers>
           {children}
           <Toaster

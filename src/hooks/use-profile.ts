@@ -48,6 +48,7 @@ export function useProfile() {
   return useQuery({
     queryKey: profileKeys.me(),
     queryFn: () => apiClient.get<ProfileData>("/api/profile"),
+    // ...queryConfig,
   });
 }
 
