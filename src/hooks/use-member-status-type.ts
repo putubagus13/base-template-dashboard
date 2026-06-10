@@ -3,6 +3,7 @@
 // MEMBER STATUS TYPE MANAGEMENT HOOKS
 // ============================================================
 
+import { ROUTES } from "@/config/routes";
 import { apiClient } from "@/lib/api-client";
 import { ListQueryParams } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +44,7 @@ export function useMemberStatusType(params: ListQueryParams = {}) {
     queryKey: memberStatusTypeKeys.list(params),
     queryFn: () =>
       apiClient.get<MemberStatusType[]>(
-        `/api/member-status-type?${searchParams.toString()}`
+        `${ROUTES.api.memberStatusType}?${searchParams.toString()}`
       ),
     placeholderData: (prev) => prev,
   });

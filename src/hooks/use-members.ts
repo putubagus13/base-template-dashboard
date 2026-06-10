@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { ListMemberQueryParam } from "@/types";
 import { GenderType } from "@prisma/client";
+import { ROUTES } from "@/config/routes";
 
 // ─── Query Keys ──────────────────────────────────────────────
 // Centralize query keys untuk konsistensi cache invalidation.
@@ -82,7 +83,7 @@ export function useMembers(params: ListMemberQueryParam = {}) {
     queryKey: memberKeys.list(params),
     queryFn: () =>
       apiClient.get<{ summary: MemberSummary; data: MemberProfile[] }>(
-        `/api/members?${searchParams.toString()}`
+        `${ROUTES.api.member}?${searchParams.toString()}`
       ),
     placeholderData: (prev) => prev,
   });
@@ -144,7 +145,7 @@ export function useDeleteMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/members/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`${ROUTES.api.member}/${id}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: memberKeys.lists() });
       toast.success("Pengguna berhasil dihapus.");
