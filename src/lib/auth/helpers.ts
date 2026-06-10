@@ -9,10 +9,11 @@ import { prisma } from "@/lib/db/prisma";
 import { verifyAccessToken } from "./jwt";
 import type { AuthUser, JwtPayload } from "@/types/auth";
 import { Organization } from "@/types";
+import { AUTH_CONFIG } from "@/config/app";
 
 const SALT_ROUNDS = 12;
-const ACCESS_TOKEN_COOKIE = "access_token";
-const REFRESH_TOKEN_COOKIE = "refresh_token";
+const ACCESS_TOKEN_COOKIE = AUTH_CONFIG.cookieNames.accessToken;
+const REFRESH_TOKEN_COOKIE = AUTH_CONFIG.cookieNames.refreshToken;
 
 // ─── Password ────────────────────────────────────────────────
 
@@ -40,7 +41,7 @@ export async function setAuthCookies(
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 15 * 60, // 15 minutes
+    maxAge: AUTH_CONFIG.ageAccessTokenExpiry, // 15 minutes in ms
     path: "/",
   });
 
@@ -48,7 +49,7 @@ export async function setAuthCookies(
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60, // 7 days or 1 day
+    maxAge: rememberMe ? AUTH_CONFIG.rememberMeExpiry : 24 * 60 * 60 * 1000, // 7 days or 1 day
     path: "/",
   });
 }

@@ -10,6 +10,7 @@ import { apiClient, ApiError } from "@/lib/api-client";
 import { useAuthStore } from "@/store/auth.store";
 // import type { AuthUser } from "@/types/auth";
 import { UserStatus } from "@prisma/client";
+import { ROUTES } from "@/config/routes";
 
 export const profileKeys = {
   all: ["profile"] as const,
@@ -47,7 +48,7 @@ type ChangePasswordPayload = {
 export function useProfile() {
   return useQuery({
     queryKey: profileKeys.me(),
-    queryFn: () => apiClient.get<ProfileData>("/api/profile"),
+    queryFn: () => apiClient.get<ProfileData>(ROUTES.api.profile),
     // ...queryConfig,
   });
 }
@@ -58,7 +59,7 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: (payload: UpdateProfilePayload) =>
-      apiClient.patch<ProfileData>("/api/profile", payload),
+      apiClient.patch<ProfileData>(ROUTES.api.profile, payload),
     onSuccess: (response) => {
       void queryClient.invalidateQueries({ queryKey: profileKeys.me() });
       if (response.data) {
@@ -86,7 +87,7 @@ export function useChangePassword() {
 
   return useMutation({
     mutationFn: (payload: ChangePasswordPayload) =>
-      apiClient.post("/api/profile/change-password", payload),
+      apiClient.post(ROUTES.api.changePassword, payload),
     onSuccess: () => {
       toast.success("Password changed. Please sign in again.");
       // Force logout since all sessions invalidated

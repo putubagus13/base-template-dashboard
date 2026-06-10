@@ -5,22 +5,24 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken } from "@/lib/auth/jwt";
+import { PUBLIC_API_ROUTES, PUBLIC_ROUTES, ROUTES } from "./config/routes";
+import { AUTH_CONFIG } from "./config/app";
 
-const PUBLIC_ROUTES = [
-  "/auth/login",
-  "/auth/register",
-  "/auth/forgot-password",
-  "/auth/reset-password",
-];
+// const PUBLIC_ROUTES = [
+//   "/auth/login",
+//   "/auth/register",
+//   "/auth/forgot-password",
+//   "/auth/reset-password",
+// ];
 
-const PUBLIC_API_ROUTES = [
-  "/api/auth/login",
-  "/api/auth/register",
-  "/api/auth/logout",
-  "/api/auth/forgot-password",
-  "/api/auth/reset-password",
-  "/api/auth/refresh",
-];
+// const PUBLIC_API_ROUTES = [
+//   "/api/auth/login",
+//   "/api/auth/register",
+//   "/api/auth/logout",
+//   "/api/auth/forgot-password",
+//   "/api/auth/reset-password",
+//   "/api/auth/refresh",
+// ];
 
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
@@ -49,11 +51,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // Public pages: redirect to dashboard if already authed
   if (isPublicRoute(pathname)) {
-    const accessToken = request.cookies.get("access_token")?.value;
+    const accessToken = request.cookies.get(
+      AUTH_CONFIG.cookieNames.accessToken
+    )?.value;
     if (accessToken) {
       try {
         await verifyAccessToken(accessToken);
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(
+          new URL(ROUTES.dashboard.home, request.url)
+        );
       } catch {
         // Invalid token — show the public page
       }
@@ -63,25 +69,31 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // Root redirect
   if (pathname === "/") {
-    const accessToken = request.cookies.get("access_token")?.value;
-    const dest = accessToken ? "/dashboard" : "/auth/login";
+    const accessToken = request.cookies.get(
+      AUTH_CONFIG.cookieNames.accessToken
+    )?.value;
+    const dest = accessToken ? ROUTES.dashboard.home : ROUTES.auth.login;
     try {
       if (accessToken) await verifyAccessToken(accessToken);
       return NextResponse.redirect(new URL(dest, request.url));
     } catch {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      return NextResponse.redirect(new URL(ROUTES.auth.login, request.url));
     }
   }
 
   // ─── Protected routes ────────────────────────────────────────
-  const accessToken = request.cookies.get("access_token")?.value;
+  const accessToken = request.cookies.get(
+    AUTH_CONFIG.cookieNames.accessToken
+  )?.value;
 
   if (!accessToken) {
     // Try silent refresh via refresh token
-    const refreshToken = request.cookies.get("refresh_token")?.value;
+    const refreshToken = request.cookies.get(
+      AUTH_CONFIG.cookieNames.refreshToken
+    )?.value;
     if (refreshToken) {
       try {
-        const refreshUrl = new URL("/api/auth/refresh", request.url);
+        const refreshUrl = new URL(ROUTES.api.auth.refresh, request.url);
         const refreshResponse = await fetch(refreshUrl, {
           method: "POST",
           headers: { Cookie: `refresh_token=${refreshToken}` },
@@ -100,7 +112,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
 
     // No valid tokens — redirect to login
-    const loginUrl = new URL("/auth/login", request.url);
+    const loginUrl = new URL(ROUTES.auth.login, request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -114,16 +126,19 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     requestHeaders.set("x-user-id", payload.sub);
     requestHeaders.set("x-user-email", payload.email);
     requestHeaders.set("x-user-roles", JSON.stringify(payload.roles));
-    requestHeaders.set("x-user-permissions", JSON.stringify(payload.permissions));
+    requestHeaders.set(
+      "x-user-permissions",
+      JSON.stringify(payload.permissions)
+    );
 
     return NextResponse.next({ request: { headers: requestHeaders } });
   } catch {
     // Token expired or invalid
-    const loginUrl = new URL("/auth/login", request.url);
+    const loginUrl = new URL(ROUTES.auth.login, request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
 
     const response = NextResponse.redirect(loginUrl);
-    response.cookies.delete("access_token");
+    response.cookies.delete(AUTH_CONFIG.cookieNames.accessToken);
     return response;
   }
 }

@@ -15,6 +15,7 @@ import type {
   ResetPasswordRequest,
   LoginResponse,
 } from "@/types/auth";
+import { ROUTES } from "@/config/routes";
 
 // ─── Login ───────────────────────────────────────────────────
 
@@ -25,7 +26,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (credentials: LoginCredentials) =>
-      apiClient.post<LoginResponse>("/api/auth/login", credentials),
+      apiClient.post<LoginResponse>(ROUTES.api.auth.login, credentials),
     onSuccess: (response) => {
       if (response.data) {
         setUser(response.data.user);
@@ -52,7 +53,7 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: (data: RegisterCredentials) =>
-      apiClient.post("/api/auth/register", data),
+      apiClient.post(ROUTES.api.auth.register, data),
     onSuccess: () => {
       toast.success("Registration successful! Please verify your email.");
       router.push("/auth/login?registered=true");
@@ -75,7 +76,7 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => apiClient.post("/api/auth/logout"),
+    mutationFn: () => apiClient.post(ROUTES.api.auth.logout),
     onSuccess: () => {
       clearUser();
       queryClient.clear();
@@ -96,7 +97,7 @@ export function useLogout() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (data: ForgotPasswordRequest) =>
-      apiClient.post("/api/auth/forgot-password", data),
+      apiClient.post(ROUTES.api.auth.forgotPassword, data),
     onSuccess: () => {
       toast.success("Password reset email sent. Please check your inbox.");
     },
@@ -117,10 +118,10 @@ export function useResetPassword() {
 
   return useMutation({
     mutationFn: (data: ResetPasswordRequest) =>
-      apiClient.post("/api/auth/reset-password", data),
+      apiClient.post(ROUTES.api.auth.resetPassword, data),
     onSuccess: () => {
       toast.success("Password reset successful! Please log in.");
-      router.push("/auth/login?reset=true");
+      router.push(`/auth/login?reset=true`);
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
