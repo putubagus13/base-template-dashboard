@@ -13,6 +13,7 @@ export const APP_CONFIG = {
 
 export const AUTH_CONFIG = {
   accessTokenExpiry: "15m",
+  ageAccessTokenExpiry: 15 * 60 * 60 * 1000, // 15 minutes in ms
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days in seconds
   rememberMeExpiry: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
   defaultExpiry: 24 * 60 * 60 * 1000, // 1 day in ms

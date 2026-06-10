@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { apiClient, ApiError } from "@/lib/api-client";
 import type { ListQueryParams } from "@/types/api";
+import { ROUTES } from "@/config/routes";
 
 // ─── Query Keys ──────────────────────────────────────────────
 // Centralize query keys untuk konsistensi cache invalidation.
@@ -58,7 +59,9 @@ export function useUsers(params: ListQueryParams = {}) {
   return useQuery({
     queryKey: userKeys.list(params),
     queryFn: () =>
-      apiClient.get<UserListItem[]>(`/api/users?${searchParams.toString()}`),
+      apiClient.get<UserListItem[]>(
+        `${ROUTES.api.users}?${searchParams.toString()}`
+      ),
     placeholderData: (prev) => prev,
   });
 }
@@ -66,7 +69,7 @@ export function useUsers(params: ListQueryParams = {}) {
 export function useUser(id: string) {
   return useQuery({
     queryKey: userKeys.detail(id),
-    queryFn: () => apiClient.get<UserListItem>(`/api/users/${id}`),
+    queryFn: () => apiClient.get<UserListItem>(`${ROUTES.api.users}/${id}`),
     enabled: Boolean(id),
   });
 }
@@ -76,7 +79,7 @@ export function useCreateUser() {
 
   return useMutation({
     mutationFn: (payload: CreateUserPayload) =>
-      apiClient.post<UserListItem>("/api/users", payload),
+      apiClient.post<UserListItem>(ROUTES.api.users, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       toast.success("Pengguna berhasil dibuat.");
@@ -96,7 +99,7 @@ export function useUpdateUser(id: string) {
 
   return useMutation({
     mutationFn: (payload: UpdateUserPayload) =>
-      apiClient.patch<UserListItem>(`/api/users/${id}`, payload),
+      apiClient.patch<UserListItem>(`${ROUTES.api.users}/${id}`, payload),
     onSuccess: (response) => {
       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       void queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
@@ -119,7 +122,7 @@ export function useDeleteUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/users/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`${ROUTES.api.users}/${id}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       toast.success("Pengguna berhasil dihapus.");
