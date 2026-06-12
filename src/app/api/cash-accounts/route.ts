@@ -4,25 +4,20 @@ import { hasPermission } from "@/lib/auth/rbac";
 import { generateMetadataPagination } from "@/utils";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { MemberProfile, MemberSummary } from "@/hooks/use-members";
-import z from "zod";
-import { GenderType } from "@prisma/client";
 import { writeAuditLog } from "@/lib/audit";
-import { FORMAT_ID } from "@/config/app";
+import z from "zod";
+import { CashAccount } from "@prisma/client";
 
-const createMemberSchema = z.object({
-  fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
-  gender: z.enum([GenderType.MALE, GenderType.FEMALE, GenderType.OTHER], {
-    required_error: "Jenis kelamin wajib dipilih",
-  }),
-  dateOfBirth: z.string().optional().nullable(),
-  address: z.string().optional().nullable(),
-  phone: z.string().optional().nullable(),
-  position: z.string().optional().nullable(),
-  statusId: z.string().optional().nullable(),
-  joinDate: z.string().optional().nullable(),
-  occupation: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
+export type CashAccountSummary = {
+  total: number;
+  activeTotal: number;
+  inactiveTotal: number;
+};
+
+const createCashAccountSchema = z.object({
+  name: z.string().min(2, "Nama akun kas minimal 2 karakter"),
+  description: z.string().optional().nullable(),
+  balance: z.number().min(0, "Saldo awal tidak boleh negatif").optional(),
   isActive: z.boolean(),
 });
 
@@ -30,7 +25,7 @@ export async function GET(request: NextRequest) {
   try {
     const authUser = await requireAuthUser();
 
-    if (!hasPermission(authUser, "read:member")) {
+    if (!hasPermission(authUser, "read:cashAccount")) {
       return ApiResponseBuilder.forbidden();
     }
     const { id: orgId } = authUser.activeOrganization;
@@ -43,79 +38,75 @@ export async function GET(request: NextRequest) {
     );
     const search = searchParams.get("search") ?? "";
     const skip = (page - 1) * limit;
-    const statusId = searchParams.get("statusId") ?? undefined;
     const isActive = searchParams.get("isActive") ?? undefined;
 
     const where = search
       ? {
           OR: [
             { name: { contains: search, mode: "insensitive" as const } },
-            { email: { contains: search, mode: "insensitive" as const } },
+            { description: { contains: search, mode: "insensitive" as const } },
           ],
         }
       : {};
 
-    const [members, activeTotal, inactiveTotal, total] =
+    const [accounts, activeTotal, inactiveTotal, total] =
       await prisma.$transaction([
-        prisma.member.findMany({
+        prisma.cashAccount.findMany({
           where: {
             ...where,
             organizationId: orgId,
-            ...(statusId && { statusId }),
-            ...(isActive && { isActive: isActive === "true" }),
+            ...(isActive !== null &&
+              isActive !== undefined && { isActive: isActive === "true" }),
             deletedAt: null,
           },
           skip,
           take: limit,
           orderBy: { createdAt: "desc" },
         }),
-        prisma.member.count({
+        prisma.cashAccount.count({
           where: {
             ...where,
             organizationId: orgId,
-            ...(statusId && { statusId }),
             deletedAt: null,
             isActive: true,
           },
         }),
-        prisma.member.count({
+        prisma.cashAccount.count({
           where: {
             ...where,
             organizationId: orgId,
-            ...(statusId && { statusId }),
             isActive: false,
             deletedAt: null,
           },
         }),
-        prisma.member.count({
+        prisma.cashAccount.count({
           where: {
             ...where,
             organizationId: orgId,
-            ...(statusId && { statusId }),
             deletedAt: null,
           },
         }),
       ]);
 
-    const response: { summary: MemberSummary; data: MemberProfile[] } = {
+    const response: { summary: CashAccountSummary; data: CashAccount[] } = {
       summary: {
         total: total,
         activeTotal: activeTotal,
         inactiveTotal: inactiveTotal,
       },
-      data: members,
+      data: accounts,
     };
 
     const metadata = generateMetadataPagination(page, limit, total);
 
     return ApiResponseBuilder.success(
       response,
-      "Members fetched successfully.",
+      "Cash accounts fetched successfully.",
       200,
       metadata
     );
   } catch (error) {
-    console.error("GET /api/member", error);
+    console.error("GET /api/cash-accounts", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }
@@ -123,61 +114,37 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const authUser = await requireAuthUser();
-    if (!hasPermission(authUser, "create:member")) {
+    if (!hasPermission(authUser, "create:cashAccount")) {
       return ApiResponseBuilder.forbidden();
     }
 
     const body: unknown = await request.json();
-    const result = createMemberSchema.safeParse(body);
+    const result = createCashAccountSchema.safeParse(body);
     if (!result.success) {
       return ApiResponseBuilder.validationError(formatZodErrors(result.error));
     }
 
-    const {
-      fullName,
-      gender,
-      dateOfBirth,
-      address,
-      phone,
-      position,
-      statusId,
-      joinDate,
-      occupation,
-      notes,
-      isActive,
-    } = result.data;
+    const { name, description, balance, isActive } = result.data;
 
-    const validationExistUser = await prisma.member.findFirst({
+    const existing = await prisma.cashAccount.findFirst({
       where: {
-        OR: [
-          { fullName: { contains: fullName, mode: "insensitive" as const } },
-        ],
+        name: { contains: name, mode: "insensitive" as const },
         organizationId: authUser.activeOrganization.id,
         deletedAt: null,
       },
     });
 
-    if (validationExistUser) {
+    if (existing) {
       return ApiResponseBuilder.conflict(
-        "Member with the same name or member number already exists."
+        "Cash account with the same name already exists."
       );
     }
 
-    const memberNumber =
-      FORMAT_ID.member + Math.random().toString(36).substring(2, 9);
-    const member = await prisma.member.create({
+    const account = await prisma.cashAccount.create({
       data: {
-        fullName,
-        memberNumber,
-        gender,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-        address: address ?? null,
-        phone: phone ?? null,
-        position: position ?? null,
-        statusId: statusId ?? null,
-        joinDate: joinDate ? new Date(joinDate) : null,
-        occupation: occupation ?? null,
-        notes: notes ?? null,
+        name,
+        description: description ?? null,
+        balance: balance ?? 0,
         isActive,
         organizationId: authUser.activeOrganization.id,
         createdBy: authUser.id,
@@ -186,22 +153,22 @@ export async function POST(request: NextRequest) {
 
     await writeAuditLog({
       userId: authUser.id,
-      action: "create_member",
-      subject: "member",
+      action: "create_cash_account",
+      subject: "cashAccount",
       newValues: result.data,
       request,
     });
 
     return ApiResponseBuilder.success(
-      member,
-      "Member created successfully.",
+      account,
+      "Cash account created successfully.",
       201
     );
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return ApiResponseBuilder.unauthorized();
     }
-    console.error("POST /api/members", error);
+    console.error("POST /api/cash-accounts", error);
     return ApiResponseBuilder.internalError();
   }
 }

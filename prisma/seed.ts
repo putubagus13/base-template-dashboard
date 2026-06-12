@@ -22,6 +22,79 @@ async function main(): Promise<void> {
     { action: "delete", subject: "role", description: "Delete roles" },
     // Dashboard
     { action: "read", subject: "dashboard", description: "Access dashboard" },
+    //Member
+    { action: "create", subject: "member", description: "Create new members" },
+    { action: "read", subject: "member", description: "View member data" },
+    { action: "update", subject: "member", description: "Update member data" },
+    { action: "delete", subject: "member", description: "Delete members" },
+    // Cash Account
+    {
+      action: "create",
+      subject: "cashAccount",
+      description: "Create new cash accounts",
+    },
+    {
+      action: "read",
+      subject: "cashAccount",
+      description: "View cash account data",
+    },
+    {
+      action: "update",
+      subject: "cashAccount",
+      description: "Update cash account data",
+    },
+    {
+      action: "delete",
+      subject: "cashAccount",
+      description: "Delete cash accounts",
+    },
+    // Transaction
+    {
+      action: "read",
+      subject: "cashTransaction",
+      description: "View transaction data",
+    },
+    {
+      action: "update",
+      subject: "cashTransaction",
+      description: "Update transaction data",
+    },
+    {
+      action: "delete",
+      subject: "cashTransaction",
+      description: "Delete transactions",
+    },
+    {
+      action: "create",
+      subject: "cashTransaction",
+      description: "Create new transactions",
+    },
+    {
+      action: "verify",
+      subject: "cashTransaction",
+      description: "Verify transaction data",
+    },
+    // Transaction category
+    {
+      action: "create",
+      subject: "cashTransactionCategory",
+      description: "Create new transaction categories",
+    },
+    {
+      action: "read",
+      subject: "cashTransactionCategory",
+      description: "View transaction category data",
+    },
+    {
+      action: "update",
+      subject: "cashTransactionCategory",
+      description: "Update transaction category data",
+    },
+    {
+      action: "delete",
+      subject: "cashTransactionCategory",
+      description: "Delete transaction category data",
+    },
   ];
 
   const createdPermissions = await Promise.all(

@@ -21,6 +21,9 @@ export const ROUTES = {
     auditLogs: "/dashboard/audit-logs",
     profile: "/dashboard/profile",
     settings: "/dashboard/settings",
+    cashAccounts: "/dashboard/finance/cash-accounts",
+    transactionCategories: "/dashboard/finance/categories",
+    transactions: "/dashboard/finance/transactions",
   },
 
   // API
@@ -43,6 +46,14 @@ export const ROUTES = {
     auditLogs: "/api/audit-logs",
     member: "/api/members",
     memberStatusType: "/api/member-status-type",
+    cashAccounts: "/api/cash-accounts",
+    cashAccount: (id: string) => `/api/cash-accounts/${id}`,
+    transactionCategories: "/api/transaction-categories",
+    transactionCategory: (id: string) => `/api/transaction-categories/${id}`,
+    cashTransactions: "/api/cash-transactions",
+    cashTransaction: (id: string) => `/api/cash-transactions/${id}`,
+    cashTransactionVerify: (id: string) =>
+      `/api/cash-transactions/${id}/verify`,
   },
 } as const;
 

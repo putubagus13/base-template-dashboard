@@ -47,6 +47,12 @@ export const RATE_LIMIT_CONFIG = {
   },
 } as const;
 
+export const FORMAT_ID = {
+  member: "TGD-",
+  invoice: "TGD-INV-",
+  transaction: "TGD-TRX-",
+};
+
 // System roles yang tidak bisa dihapus
 export const SYSTEM_ROLES = ["SUPER_ADMIN", "USER"] as const;
 export type SystemRole = (typeof SYSTEM_ROLES)[number];

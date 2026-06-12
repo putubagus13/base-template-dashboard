@@ -53,18 +53,35 @@ export type MemberProfile = {
   deletedAt: Date | null;
 };
 
-// type CreateUserPayload = {
-//   name: string;
-//   email: string;
-//   password: string;
-//   roleIds: string[];
-// };
+export type CreateMemberPayload = {
+  fullName: string;
+  memberNumber: string;
+  gender: GenderType;
+  dateOfBirth?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  position?: string | null;
+  statusId?: string | null;
+  joinDate?: string | null;
+  occupation?: string | null;
+  notes?: string | null;
+  isActive: boolean;
+};
 
-// type UpdateUserPayload = {
-//   name?: string;
-//   status?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
-//   roleIds?: string[];
-// };
+export type UpdateMemberPayload = {
+  fullName?: string;
+  memberNumber?: string;
+  gender?: GenderType;
+  dateOfBirth?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  position?: string | null;
+  statusId?: string | null;
+  joinDate?: string | null;
+  occupation?: string | null;
+  notes?: string | null;
+  isActive?: boolean;
+};
 
 // ─── Hooks ───────────────────────────────────────────────────
 
@@ -97,49 +114,45 @@ export function useMembers(params: ListMemberQueryParam = {}) {
 //   });
 // }
 
-// export function useCreateUser() {
-//   const queryClient = useQueryClient();
+export function useCreateMember() {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: (payload: CreateUserPayload) =>
-//       apiClient.post<UserListItem>("/api/users", payload),
-//     onSuccess: () => {
-//       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-//       toast.success("Pengguna berhasil dibuat.");
-//     },
-//     onError: (error: unknown) => {
-//       if (error instanceof ApiError) {
-//         toast.error(error.message);
-//       } else {
-//         toast.error("Gagal membuat pengguna.");
-//       }
-//     },
-//   });
-// }
+  return useMutation({
+    mutationFn: (payload: CreateMemberPayload) =>
+      apiClient.post<MemberProfile>(ROUTES.api.member, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: memberKeys.lists() });
+      toast.success("Member berhasil ditambahkan.");
+    },
+    onError: (error: unknown) => {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Gagal menambahkan member.");
+      }
+    },
+  });
+}
 
-// export function useUpdateUser(id: string) {
-//   const queryClient = useQueryClient();
+export function useUpdateMember(id: string) {
+  const queryClient = useQueryClient();
 
-//   return useMutation({
-//     mutationFn: (payload: UpdateUserPayload) =>
-//       apiClient.patch<UserListItem>(`/api/users/${id}`, payload),
-//     onSuccess: (response) => {
-//       void queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-//       void queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
-//       if (response.data) {
-//         queryClient.setQueryData(userKeys.detail(id), response);
-//       }
-//       toast.success("Pengguna berhasil diperbarui.");
-//     },
-//     onError: (error: unknown) => {
-//       if (error instanceof ApiError) {
-//         toast.error(error.message);
-//       } else {
-//         toast.error("Gagal memperbarui pengguna.");
-//       }
-//     },
-//   });
-// }
+  return useMutation({
+    mutationFn: (payload: UpdateMemberPayload) =>
+      apiClient.patch<MemberProfile>(`${ROUTES.api.member}/${id}`, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: memberKeys.lists() });
+      toast.success("Member berhasil diperbarui.");
+    },
+    onError: (error: unknown) => {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Gagal memperbarui member.");
+      }
+    },
+  });
+}
 
 export function useDeleteMember() {
   const queryClient = useQueryClient();

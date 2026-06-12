@@ -1,4 +1,4 @@
-// src/app/dashboard/users/_components/user-form-dialog.tsx
+// src/app/dashboard/member/_components/members-form-dialog.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -10,306 +10,557 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCreateUser, useUpdateUser } from "@/hooks/use-users";
-import { useRoles } from "@/hooks/use-roles";
-import { Spinner } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useCreateMember,
+  useUpdateMember,
+  MemberProfile,
+} from "@/hooks/use-members";
+import { useGlobalShareStore } from "@/store/global-share.store";
+
+// ─── Position Options ─────────────────────────────────────────
+
+const POSITION_OPTIONS = [
+  { value: "Ketua", label: "Ketua" },
+  { value: "Wakil Ketua", label: "Wakil Ketua" },
+  { value: "Sekertaris", label: "Sekertaris" },
+  { value: "Bendahara", label: "Bendahara" },
+  { value: "Anggota", label: "Anggota" },
+  { value: "Anggota Kehormatan", label: "Anggota Kehormatan" },
+] as const;
+
+const GENDER_OPTIONS = [
+  { value: "MALE", label: "Laki-laki" },
+  { value: "FEMALE", label: "Perempuan" },
+  { value: "OTHER", label: "Lainnya" },
+] as const;
 
 // ─── Schemas ──────────────────────────────────────────────────
 
 const createSchema = z.object({
-  name: z.string().min(2, "Nama minimal 2 karakter"),
-  email: z.string().email("Alamat email tidak valid"),
-  password: z
-    .string()
-    .min(8, "Kata sandi minimal 8 karakter")
-    .regex(/[A-Z]/, "Kata sandi harus mengandung huruf besar")
-    .regex(/[0-9]/, "Kata sandi harus mengandung angka"),
-  roleIds: z.array(z.string()).min(1, "Select at least one role"),
+  fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
+  memberNumber: z.string().min(1, "Nomor anggota wajib diisi"),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"], {
+    required_error: "Jenis kelamin wajib dipilih",
+  }),
+  dateOfBirth: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  position: z.string().optional().nullable(),
+  statusId: z.string().optional().nullable(),
+  joinDate: z.string().optional().nullable(),
+  occupation: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+  isActive: z.boolean(),
 });
 
-const editSchema = z.object({
-  name: z.string().min(2, "Nama minimal 2 karakter"),
-  status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]),
-  roleIds: z.array(z.string()).min(1, "Pilih setidaknya satu role"),
-});
+const editSchema = createSchema;
 
 type CreateInput = z.infer<typeof createSchema>;
 type EditInput = z.infer<typeof editSchema>;
 
 // ─── Types ────────────────────────────────────────────────────
 
-type UserForEdit = {
-  id: string;
-  name: string;
-  email: string;
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING_VERIFICATION";
-  roles: { id: string; name: string }[];
-};
+type MemberForEdit = Pick<
+  MemberProfile,
+  | "id"
+  | "fullName"
+  | "memberNumber"
+  | "gender"
+  | "dateOfBirth"
+  | "address"
+  | "phone"
+  | "position"
+  | "statusId"
+  | "joinDate"
+  | "occupation"
+  | "notes"
+  | "isActive"
+>;
 
-type UserFormDialogProps = {
+type MemberFormDialogProps = {
   open: boolean;
   onClose: () => void;
-  user?: UserForEdit | undefined;
+  member?: MemberForEdit | undefined;
 };
 
-// ─── Create Form ──────────────────────────────────────────────
+// ─── Helper ────────────────────────────────────────────────────
 
-function CreateUserForm({ onClose }: { onClose: () => void }) {
-  const createUser = useCreateUser();
-  const { data: rolesData, isLoading: rolesLoading } = useRoles();
+function toDateInputValue(value: Date | string | null | undefined): string {
+  if (!value) return "";
+  const d = value instanceof Date ? value : new Date(value);
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString().split("T")[0] ?? "";
+}
+
+// ─── Create Form ───────────────────────────────────────────────
+
+function CreateMemberForm({ onClose }: { onClose: () => void }) {
+  const createMember = useCreateMember();
+  const { memberStatusType } = useGlobalShareStore();
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateInput>({
     resolver: zodResolver(createSchema),
-    defaultValues: { roleIds: [] },
+    defaultValues: {
+      isActive: true,
+      position: "",
+      statusId: "",
+    },
   });
 
-  const selectedRoleIds = watch("roleIds");
-
-  const toggleRole = (roleId: string) => {
-    const current = selectedRoleIds;
-    setValue(
-      "roleIds",
-      current.includes(roleId)
-        ? current.filter((id) => id !== roleId)
-        : [...current, roleId],
-      { shouldValidate: true }
-    );
-  };
+  const isActiveValue = watch("isActive");
 
   const onSubmit = (data: CreateInput) => {
-    createUser.mutate(data, { onSuccess: onClose });
+    const payload = {
+      ...data,
+      dateOfBirth: data.dateOfBirth || null,
+      address: data.address || null,
+      phone: data.phone || null,
+      position: data.position || null,
+      statusId: data.statusId || null,
+      joinDate: data.joinDate || null,
+      occupation: data.occupation || null,
+      notes: data.notes || null,
+    };
+    createMember.mutate(payload, { onSuccess: onClose });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Nama Lengkap"
+          htmlFor="fullName"
+          error={errors.fullName?.message}
+          required
+        >
+          <Input
+            id="fullName"
+            placeholder="Nama lengkap"
+            error={errors.fullName?.message}
+            {...register("fullName")}
+          />
+        </FormField>
+
+        <FormField
+          label="Nomor Anggota"
+          htmlFor="memberNumber"
+          error={errors.memberNumber?.message}
+          required
+        >
+          <Input
+            id="memberNumber"
+            placeholder="Nomor anggota"
+            error={errors.memberNumber?.message}
+            {...register("memberNumber")}
+          />
+        </FormField>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Jenis Kelamin"
+          htmlFor="gender"
+          error={errors.gender?.message}
+          required
+        >
+          <Select
+            id="gender"
+            options={GENDER_OPTIONS.map((o) => ({
+              value: o.value,
+              label: o.label,
+            }))}
+            placeholder="Pilih jenis kelamin"
+            error={errors.gender?.message}
+            {...register("gender")}
+          />
+        </FormField>
+
+        <FormField
+          label="Tanggal Lahir"
+          htmlFor="dateOfBirth"
+          error={errors.dateOfBirth?.message}
+        >
+          <Input id="dateOfBirth" type="date" {...register("dateOfBirth")} />
+        </FormField>
+      </div>
+
       <FormField
-        label="Nama"
-        htmlFor="name"
-        error={errors.name?.message}
-        required
+        label="Alamat"
+        htmlFor="address"
+        error={errors.address?.message}
       >
-        <Input
-          id="name"
-          placeholder="John Doe"
-          error={errors.name?.message}
-          {...register("name")}
+        <Textarea
+          id="address"
+          placeholder="Alamat lengkap"
+          rows={2}
+          {...register("address")}
         />
       </FormField>
 
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Telepon"
+          htmlFor="phone"
+          error={errors.phone?.message}
+        >
+          <Input
+            id="phone"
+            placeholder="Nomor telepon"
+            {...register("phone")}
+          />
+        </FormField>
+
+        <FormField
+          label="Pekerjaan"
+          htmlFor="occupation"
+          error={errors.occupation?.message}
+        >
+          <Input
+            id="occupation"
+            placeholder="Pekerjaan"
+            {...register("occupation")}
+          />
+        </FormField>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Jabatan"
+          htmlFor="position"
+          error={errors.position?.message}
+        >
+          <Select
+            id="position"
+            options={POSITION_OPTIONS.map((o) => ({
+              value: o.value,
+              label: o.label,
+            }))}
+            placeholder="Pilih jabatan"
+            {...register("position")}
+          />
+        </FormField>
+
+        <FormField
+          label="Status Keanggotaan"
+          htmlFor="statusId"
+          error={errors.statusId?.message}
+        >
+          <Select
+            id="statusId"
+            options={memberStatusType.map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))}
+            placeholder="Pilih status"
+            {...register("statusId")}
+          />
+        </FormField>
+      </div>
+
       <FormField
-        label="Email"
-        htmlFor="email"
-        error={errors.email?.message}
-        required
+        label="Tanggal Bergabung"
+        htmlFor="joinDate"
+        error={errors.joinDate?.message}
       >
-        <Input
-          id="email"
-          type="email"
-          placeholder="john@example.com"
-          error={errors.email?.message}
-          {...register("email")}
+        <Input id="joinDate" type="date" {...register("joinDate")} />
+      </FormField>
+
+      <FormField label="Catatan" htmlFor="notes" error={errors.notes?.message}>
+        <Textarea
+          id="notes"
+          placeholder="Catatan tambahan"
+          rows={2}
+          {...register("notes")}
         />
       </FormField>
 
-      <FormField
-        label="Kata sandi"
-        htmlFor="password"
-        error={errors.password?.message}
-        required
-      >
-        <Input
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          error={errors.password?.message}
-          {...register("password")}
-        />
-      </FormField>
-
-      <FormField
-        label="Roles"
-        htmlFor="roles"
-        error={errors.roleIds?.message}
-        required
-      >
-        {rolesLoading ? (
-          <div className="flex items-center gap-2 py-2 text-sm text-slate-500">
-            <Spinner size="sm" /> Loading roles...
-          </div>
-        ) : (
-          <div className="space-y-2 rounded-lg border border-slate-200 p-3">
-            {rolesData?.data?.map((role) => (
-              <Checkbox
-                key={role.id}
-                id={`role-${role.id}`}
-                label={role.name || undefined}
-                description={role.description ?? undefined}
-                checked={selectedRoleIds.includes(role.id)}
-                onChange={() => toggleRole(role.id)}
-              />
-            ))}
-          </div>
-        )}
-      </FormField>
+      <Checkbox
+        id="isActive"
+        label="Aktif"
+        description="Tandai sebagai member aktif"
+        checked={isActiveValue}
+        onChange={(e) =>
+          setValue("isActive", (e.target as HTMLInputElement).checked)
+        }
+      />
 
       <DialogFooter className="-mx-6 -mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+          Batal
         </Button>
-        <Button type="submit" isLoading={createUser.isPending}>
-          Create User
+        <Button type="submit" isLoading={createMember.isPending}>
+          Tambah Member
         </Button>
       </DialogFooter>
     </form>
   );
 }
 
-// ─── Edit Form ────────────────────────────────────────────────
+// ─── Edit Form ─────────────────────────────────────────────────
 
-function EditUserForm({
-  user,
+function EditMemberForm({
+  member,
   onClose,
 }: {
-  user: UserForEdit;
+  member: MemberForEdit;
   onClose: () => void;
 }) {
-  const updateUser = useUpdateUser(user.id);
-  const { data: rolesData, isLoading: rolesLoading } = useRoles();
+  const updateMember = useUpdateMember(member.id);
+  const { memberStatusType } = useGlobalShareStore();
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<EditInput>({
     resolver: zodResolver(editSchema),
     defaultValues: {
-      name: user.name,
-      status: user.status === "PENDING_VERIFICATION" ? "ACTIVE" : user.status,
-      roleIds: user.roles.map((r) => r.id),
+      fullName: member.fullName,
+      memberNumber: member.memberNumber,
+      gender: member.gender,
+      dateOfBirth: toDateInputValue(member.dateOfBirth),
+      address: member.address ?? "",
+      phone: member.phone ?? "",
+      position: member.position ?? "",
+      statusId: member.statusId ?? "",
+      joinDate: toDateInputValue(member.joinDate),
+      occupation: member.occupation ?? "",
+      notes: member.notes ?? "",
+      isActive: member.isActive,
     },
   });
 
-  const selectedRoleIds = watch("roleIds");
-
-  const toggleRole = (roleId: string) => {
-    const current = selectedRoleIds;
-    setValue(
-      "roleIds",
-      current.includes(roleId)
-        ? current.filter((id) => id !== roleId)
-        : [...current, roleId],
-      { shouldValidate: true }
-    );
-  };
+  const isActiveValue = watch("isActive");
 
   const onSubmit = (data: EditInput) => {
-    updateUser.mutate(data, { onSuccess: onClose });
+    const payload = {
+      ...data,
+      dateOfBirth: data.dateOfBirth || null,
+      address: data.address || null,
+      phone: data.phone || null,
+      position: data.position || null,
+      statusId: data.statusId || null,
+      joinDate: data.joinDate || null,
+      occupation: data.occupation || null,
+      notes: data.notes || null,
+    };
+    updateMember.mutate(payload, { onSuccess: onClose });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="rounded-lg bg-slate-50 px-3 py-2.5 text-sm text-slate-500">
-        <span className="font-medium text-slate-700">Email:</span> {user.email}
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Nama Lengkap"
+          htmlFor="edit-fullName"
+          error={errors.fullName?.message}
+          required
+        >
+          <Input
+            id="edit-fullName"
+            placeholder="Nama lengkap"
+            error={errors.fullName?.message}
+            {...register("fullName")}
+          />
+        </FormField>
+
+        <FormField
+          label="Nomor Anggota"
+          htmlFor="edit-memberNumber"
+          error={errors.memberNumber?.message}
+          required
+        >
+          <Input
+            id="edit-memberNumber"
+            placeholder="Nomor anggota"
+            error={errors.memberNumber?.message}
+            {...register("memberNumber")}
+          />
+        </FormField>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Jenis Kelamin"
+          htmlFor="edit-gender"
+          error={errors.gender?.message}
+          required
+        >
+          <Select
+            id="edit-gender"
+            options={GENDER_OPTIONS.map((o) => ({
+              value: o.value,
+              label: o.label,
+            }))}
+            placeholder="Pilih jenis kelamin"
+            error={errors.gender?.message}
+            {...register("gender")}
+          />
+        </FormField>
+
+        <FormField
+          label="Tanggal Lahir"
+          htmlFor="edit-dateOfBirth"
+          error={errors.dateOfBirth?.message}
+        >
+          <Input
+            id="edit-dateOfBirth"
+            type="date"
+            {...register("dateOfBirth")}
+          />
+        </FormField>
       </div>
 
       <FormField
-        label="Full name"
-        htmlFor="edit-name"
-        error={errors.name?.message}
-        required
+        label="Alamat"
+        htmlFor="edit-address"
+        error={errors.address?.message}
       >
-        <Input
-          id="edit-name"
-          error={errors.name?.message}
-          {...register("name")}
+        <Textarea
+          id="edit-address"
+          placeholder="Alamat lengkap"
+          rows={2}
+          {...register("address")}
         />
       </FormField>
 
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Telepon"
+          htmlFor="edit-phone"
+          error={errors.phone?.message}
+        >
+          <Input
+            id="edit-phone"
+            placeholder="Nomor telepon"
+            {...register("phone")}
+          />
+        </FormField>
+
+        <FormField
+          label="Pekerjaan"
+          htmlFor="edit-occupation"
+          error={errors.occupation?.message}
+        >
+          <Input
+            id="edit-occupation"
+            placeholder="Pekerjaan"
+            {...register("occupation")}
+          />
+        </FormField>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          label="Jabatan"
+          htmlFor="edit-position"
+          error={errors.position?.message}
+        >
+          <Select
+            id="edit-position"
+            options={POSITION_OPTIONS.map((o) => ({
+              value: o.value,
+              label: o.label,
+            }))}
+            placeholder="Pilih jabatan"
+            {...register("position")}
+          />
+        </FormField>
+
+        <FormField
+          label="Status Keanggotaan"
+          htmlFor="edit-statusId"
+          error={errors.statusId?.message}
+        >
+          <Select
+            id="edit-statusId"
+            options={memberStatusType.map((s) => ({
+              value: s.id,
+              label: s.name,
+            }))}
+            placeholder="Pilih status"
+            {...register("statusId")}
+          />
+        </FormField>
+      </div>
+
       <FormField
-        label="Status"
-        htmlFor="edit-status"
-        error={errors.status?.message}
-        required
+        label="Tanggal Bergabung"
+        htmlFor="edit-joinDate"
+        error={errors.joinDate?.message}
       >
-        <Select
-          id="edit-status"
-          options={[
-            { value: "ACTIVE", label: "Active" },
-            { value: "INACTIVE", label: "Inactive" },
-            { value: "SUSPENDED", label: "Suspended" },
-          ]}
-          error={errors.status?.message}
-          {...register("status")}
-        />
+        <Input id="edit-joinDate" type="date" {...register("joinDate")} />
       </FormField>
 
       <FormField
-        label="Roles"
-        htmlFor="edit-roles"
-        error={errors.roleIds?.message}
-        required
+        label="Catatan"
+        htmlFor="edit-notes"
+        error={errors.notes?.message}
       >
-        {rolesLoading ? (
-          <div className="flex items-center gap-2 py-2 text-sm text-slate-500">
-            <Spinner size="sm" /> Loading roles...
-          </div>
-        ) : (
-          <div className="space-y-2 rounded-lg border border-slate-200 p-3">
-            {rolesData?.data?.map((role) => (
-              <Checkbox
-                key={role.id}
-                id={`edit-role-${role.id}`}
-                label={role.name}
-                description={role.description ?? undefined}
-                checked={selectedRoleIds.includes(role.id)}
-                onChange={() => toggleRole(role.id)}
-              />
-            ))}
-          </div>
-        )}
+        <Textarea
+          id="edit-notes"
+          placeholder="Catatan tambahan"
+          rows={2}
+          {...register("notes")}
+        />
       </FormField>
+
+      <Checkbox
+        id="edit-isActive"
+        label="Aktif"
+        description="Tandai sebagai member aktif"
+        checked={isActiveValue}
+        onChange={(e) =>
+          setValue("isActive", (e.target as HTMLInputElement).checked)
+        }
+      />
 
       <DialogFooter className="-mx-6 -mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+          Batal
         </Button>
-        <Button type="submit" isLoading={updateUser.isPending}>
-          Save Changes
+        <Button type="submit" isLoading={updateMember.isPending}>
+          Simpan Perubahan
         </Button>
       </DialogFooter>
     </form>
   );
 }
 
-// ─── Main Dialog ──────────────────────────────────────────────
+// ─── Main Dialog ───────────────────────────────────────────────
 
-export function UserFormDialog({ open, onClose, user }: UserFormDialogProps) {
-  const isEditing = Boolean(user);
+export function MemberFormDialog({
+  open,
+  onClose,
+  member,
+}: MemberFormDialogProps) {
+  const isEditing = Boolean(member);
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      title={isEditing ? "Edit Pengguna" : "Buat Pengguna"}
+      title={isEditing ? "Edit Member" : "Tambah Member"}
       description={
         isEditing
-          ? "Perbarui informasi pengguna dan peran yang dialaminya."
-          : "Isikan detail untuk membuat akun pengguna baru."
+          ? "Perbarui informasi data member."
+          : "Isikan detail untuk menambahkan member baru."
       }
-      size="md"
+      size="lg"
     >
-      {isEditing && user ? (
-        <EditUserForm user={user} onClose={onClose} />
+      {isEditing && member ? (
+        <EditMemberForm member={member} onClose={onClose} />
       ) : (
-        <CreateUserForm onClose={onClose} />
+        <CreateMemberForm onClose={onClose} />
       )}
     </Dialog>
   );

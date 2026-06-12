@@ -3,14 +3,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
   Shield,
   Settings,
   ChevronRight,
+  ChevronDown,
   Activity,
   User,
+  Wallet,
+  Landmark,
+  ArrowLeftRight,
+  Tags,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
@@ -20,12 +26,11 @@ import Image from "next/image";
 
 type NavItem = {
   label: string;
-  href: string;
+  href?: string;
   icon: React.ElementType;
-  // Menggunakan PermissionString ("action:subject") langsung
-  // agar tidak perlu unsafe type cast di renderItem
   permission?: PermissionString;
   adminOnly?: boolean;
+  children?: NavItem[];
 };
 
 const NAV_ITEMS: NavItem[] = [
@@ -40,6 +45,30 @@ const NAV_ITEMS: NavItem[] = [
     href: "/dashboard/member",
     icon: Users,
     permission: "read:member",
+  },
+  {
+    label: "Keuangan",
+    icon: Wallet,
+    children: [
+      {
+        label: "Akun Kas",
+        href: "/dashboard/finance/cash-accounts",
+        icon: Landmark,
+        permission: "read:cashAccount",
+      },
+      {
+        label: "Kategori Transaksi",
+        href: "/dashboard/finance/categories",
+        icon: Tags,
+        permission: "read:transactionCategory",
+      },
+      {
+        label: "Transaksi",
+        href: "/dashboard/finance/transactions",
+        icon: ArrowLeftRight,
+        permission: "read:cashTransaction",
+      },
+    ],
   },
   {
     label: "Pengguna",
@@ -75,10 +104,26 @@ export function Sidebar() {
   const pathname = usePathname();
   const { can, isSuperAdmin } = usePermissions();
 
+  // Track which parent menus are expanded
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
+    {}
+  );
+
   const isActive = (href: string) =>
     href === "/dashboard"
       ? pathname === "/dashboard"
       : pathname.startsWith(href);
+
+  const toggleMenu = (label: string) => {
+    setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const isChildActive = (item: NavItem): boolean => {
+    if (item.children) {
+      return item.children.some((child) => child.href && isActive(child.href));
+    }
+    return false;
+  };
 
   const renderItem = (item: NavItem) => {
     const show =
@@ -86,6 +131,61 @@ export function Sidebar() {
       (!item.adminOnly || isSuperAdmin);
 
     if (!show) return null;
+
+    // Parent menu with children (submenu)
+    if (item.children) {
+      // Filter visible children based on permissions
+      const visibleChildren = item.children.filter(
+        (child) =>
+          (!child.permission || can(child.permission)) &&
+          (!child.adminOnly || isSuperAdmin)
+      );
+      // Don't render parent if no children are visible
+      if (visibleChildren.length === 0) return null;
+
+      const childActive = isChildActive(item);
+      const isExpanded = expandedMenus[item.label] ?? childActive;
+
+      return (
+        <li key={item.label}>
+          <button
+            type="button"
+            onClick={() => toggleMenu(item.label)}
+            className={cn(
+              "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+              childActive
+                ? "bg-brand-50 text-brand-700"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            )}
+          >
+            <item.icon
+              className={cn(
+                "h-4 w-4 shrink-0 transition-colors",
+                childActive
+                  ? "text-brand-600"
+                  : "text-slate-400 group-hover:text-slate-600"
+              )}
+            />
+            <span className="flex-1 text-left">{item.label}</span>
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 shrink-0 transition-transform",
+                isExpanded ? "rotate-0" : "-rotate-90",
+                childActive ? "text-brand-400" : "text-slate-400"
+              )}
+            />
+          </button>
+          {isExpanded && (
+            <ul className="mt-0.5 space-y-0.5 pl-7">
+              {visibleChildren.map((child) => renderItem(child))}
+            </ul>
+          )}
+        </li>
+      );
+    }
+
+    // Regular item without children
+    if (!item.href) return null;
 
     return (
       <li key={item.href}>
@@ -120,11 +220,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
         <div className="flex items-center gap-2.5">
-          {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 shadow-sm shadow-brand-600/30">
-            <span className="text-sm font-bold text-white">D</span>
-          </div> */}
           <div className="w-9 h-9 flex items-center justify-center shrink-0">
-            {/* <span className="text-xs font-display font-bold text-white">S</span> */}
             <Image
               src={STT_TGD_LOGO.src}
               alt="Logo"

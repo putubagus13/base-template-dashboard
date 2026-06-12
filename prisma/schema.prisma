@@ -44,6 +44,18 @@ enum GenderType {
   OTHER
 }
 
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -66,6 +78,8 @@ model User {
   tokens            Token[]
   auditLogs         AuditLog[]
   organizations     UserOrganization[]
+  recordedTransactions CashTransaction[] @relation("CashTransactionRecorder")
+  verifiedTransactions CashTransaction[] @relation("CashTransactionVerifier")
 
   @@index([email])
   @@map("users")
@@ -201,11 +215,13 @@ model Organization {
   deletedAt   DateTime?
 
   // Relations
-  users         UserOrganization[]
-  roles         Role[]
-  cashAccounts  CashAccount[]
-  members       Member[]
-  memberStatusTypes MemberStatusType[]
+  users                UserOrganization[]
+  roles                Role[]
+  cashAccounts         CashAccount[]
+  members              Member[]
+  memberStatusTypes    MemberStatusType[]
+  transactionCategories TransactionCategory[]
+  cashTransactions     CashTransaction[]
 
   @@index([name])
   @@map("organization")
@@ -236,20 +252,83 @@ model CashAccount {
   name              String
   description       String?
   organizationId    String
-  balance           Float    @default(0)
+  balance           Decimal  @default(0) @db.Decimal(15, 2)
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   createdBy         String?
+  updatedAt         DateTime @updatedAt
   updatedBy         String?
   deletedAt         DateTime?
 
   // Relations
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization  Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  transactions  CashTransaction[]
 
   @@index([organizationId])
   @@index([name])
   @@index([name, organizationId])
   @@map("cash_accounts")
+}
+
+model TransactionCategory {
+  id              String   @id @default(uuid())
+  organizationId  String
+  name            String
+  description     String?
+  color           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  transactions    CashTransaction[]
+
+  @@index([organizationId])
+  @@index([name])
+  @@map("transaction_categories")
+}
+
+model CashTransaction {
+  id                  String            @id @default(uuid())
+  organizationId      String
+  accountId           String
+  categoryId          String?
+  type                TransactionType
+  amount              Decimal           @db.Decimal(15, 2)
+  description         String
+  referenceNo         String?
+  donorId             String?
+  transactionDate     DateTime          @db.Date
+  recordedBy          String
+  attachmentUrl       String?
+  isVerified          Boolean           @default(false)
+  verificationStatus  TransactionStatus @default(PENDING)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+  notes               String?
+  createdAt           DateTime          @default(now())
+  createdBy           String?
+  updatedAt           DateTime          @updatedAt
+  updatedBy           String?
+  deletedAt           DateTime?
+
+  // Relations
+  organization        Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  account             CashAccount           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category            TransactionCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  recorder            User                  @relation("CashTransactionRecorder", fields: [recordedBy], references: [id])
+  verifier            User?                 @relation("CashTransactionVerifier", fields: [verifiedBy], references: [id])
+
+  @@index([accountId])
+  @@index([organizationId])
+  @@index([categoryId])
+  @@index([transactionDate])
+  @@index([verificationStatus])
+  @@map("cash_transactions")
 }
 
 model MemberStatusType {
