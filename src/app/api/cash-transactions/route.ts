@@ -26,6 +26,7 @@ const createCashTransactionSchema = z.object({
   amount: z.number().positive("Jumlah harus lebih dari 0"),
   description: z.string().min(2, "Deskripsi minimal 2 karakter"),
   referenceNo: z.string().optional().nullable(),
+  donorId: z.string().uuid().optional().nullable(),
   transactionDate: z.string(),
   notes: z.string().optional().nullable(),
 });
@@ -35,6 +36,7 @@ const includeRelations = {
   category: { select: { id: true, name: true, color: true } },
   recorder: { select: { id: true, name: true } },
   verifier: { select: { id: true, name: true } },
+  donor: { select: { id: true, name: true } },
 };
 
 export async function GET(request: NextRequest) {
@@ -155,6 +157,7 @@ export async function POST(request: NextRequest) {
       amount,
       description,
       referenceNo,
+      donorId,
       transactionDate,
       notes,
     } = result.data;
@@ -174,6 +177,14 @@ export async function POST(request: NextRequest) {
       if (!category) return ApiResponseBuilder.notFound("Transaction category");
     }
 
+    // Validate donor belongs to org if provided
+    if (donorId) {
+      const donor = await prisma.donor.findFirst({
+        where: { id: donorId, organizationId: orgId, deletedAt: null },
+      });
+      if (!donor) return ApiResponseBuilder.notFound("Donor");
+    }
+
     const transaction = await prisma.cashTransaction.create({
       data: {
         organizationId: orgId,
@@ -183,6 +194,7 @@ export async function POST(request: NextRequest) {
         amount,
         description,
         referenceNo: referenceNo ?? null,
+        donorId: donorId ?? null,
         transactionDate: new Date(transactionDate),
         recordedBy: authUser.id,
         notes: notes ?? null,

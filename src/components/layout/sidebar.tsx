@@ -17,6 +17,9 @@ import {
   Landmark,
   ArrowLeftRight,
   Tags,
+  Heart,
+  HandCoins,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
@@ -51,6 +54,12 @@ const NAV_ITEMS: NavItem[] = [
     icon: Wallet,
     children: [
       {
+        label: "Ringkasan",
+        href: "/dashboard/finance/summary",
+        icon: BarChart3,
+        permission: "read:cashTransaction",
+      },
+      {
         label: "Akun Kas",
         href: "/dashboard/finance/cash-accounts",
         icon: Landmark,
@@ -67,6 +76,18 @@ const NAV_ITEMS: NavItem[] = [
         href: "/dashboard/finance/transactions",
         icon: ArrowLeftRight,
         permission: "read:cashTransaction",
+      },
+      {
+        label: "Donatur",
+        href: "/dashboard/finance/donors",
+        icon: Heart,
+        permission: "read:donor",
+      },
+      {
+        label: "Donasi",
+        href: "/dashboard/finance/donations",
+        icon: HandCoins,
+        permission: "create:cashTransaction",
       },
     ],
   },

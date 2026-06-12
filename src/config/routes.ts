@@ -24,6 +24,9 @@ export const ROUTES = {
     cashAccounts: "/dashboard/finance/cash-accounts",
     transactionCategories: "/dashboard/finance/categories",
     transactions: "/dashboard/finance/transactions",
+    donors: "/dashboard/finance/donors",
+    donations: "/dashboard/finance/donations",
+    financeSummary: "/dashboard/finance/summary",
   },
 
   // API
@@ -54,6 +57,11 @@ export const ROUTES = {
     cashTransaction: (id: string) => `/api/cash-transactions/${id}`,
     cashTransactionVerify: (id: string) =>
       `/api/cash-transactions/${id}/verify`,
+    donors: "/api/donors",
+    donor: (id: string) => `/api/donors/${id}`,
+    donorLeaderboard: "/api/donors/leaderboard",
+    financeSummary: "/api/finance/summary",
+    memberSearch: "/api/members/search",
   },
 } as const;
 

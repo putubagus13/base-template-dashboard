@@ -3,7 +3,12 @@ import { writeAuditLog } from "@/lib/audit";
 import { requireAuthUser } from "@/lib/auth/helpers";
 import { hasPermission } from "@/lib/auth/rbac";
 import { prisma } from "@/lib/db/prisma";
-import { TransactionStatus, TransactionType, Prisma } from "@prisma/client";
+import {
+  TransactionStatus,
+  TransactionType,
+  Prisma,
+  DonorVerificationStatus,
+} from "@prisma/client";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -60,7 +65,7 @@ export async function POST(request: NextRequest, context: RouteParams) {
           : new Prisma.Decimal(0); // TRANSFER doesn't change overall balance
 
       // Use $transaction to atomically update transaction + balance
-      const [transaction] = await prisma.$transaction([
+      const ops = [
         prisma.cashTransaction.update({
           where: { id },
           data: {
@@ -76,6 +81,7 @@ export async function POST(request: NextRequest, context: RouteParams) {
             category: { select: { id: true, name: true, color: true } },
             recorder: { select: { id: true, name: true } },
             verifier: { select: { id: true, name: true } },
+            donor: { select: { id: true, name: true } },
           },
         }),
         // Update cash account balance
@@ -86,7 +92,23 @@ export async function POST(request: NextRequest, context: RouteParams) {
             updatedBy: authUser.id,
           },
         }),
-      ]);
+      ];
+
+      // If INCOME with donorId, increment donor's totalDonated
+      if (existing.type === TransactionType.INCOME && existing.donorId) {
+        ops.push(
+          prisma.donor.update({
+            where: { id: existing.donorId },
+            data: {
+              totalDonated: { increment: amount },
+              verificationStatus: DonorVerificationStatus.APPROVED,
+              updatedBy: authUser.id,
+            },
+          }) as never
+        );
+      }
+
+      const [transaction] = await prisma.$transaction(ops);
 
       await writeAuditLog({
         userId: authUser.id,
@@ -104,23 +126,40 @@ export async function POST(request: NextRequest, context: RouteParams) {
       );
     } else {
       // Reject
-      const transaction = await prisma.cashTransaction.update({
-        where: { id },
-        data: {
-          isVerified: false,
-          verificationStatus: TransactionStatus.REJECTED,
-          verifiedBy: authUser.id,
-          verifiedAt: now,
-          ...(notes !== undefined && { notes: notes ?? null }),
-          updatedBy: authUser.id,
-        },
-        include: {
-          account: { select: { id: true, name: true } },
-          category: { select: { id: true, name: true, color: true } },
-          recorder: { select: { id: true, name: true } },
-          verifier: { select: { id: true, name: true } },
-        },
-      });
+      const ops = [
+        prisma.cashTransaction.update({
+          where: { id },
+          data: {
+            isVerified: false,
+            verificationStatus: TransactionStatus.REJECTED,
+            verifiedBy: authUser.id,
+            verifiedAt: now,
+            ...(notes !== undefined && { notes: notes ?? null }),
+            updatedBy: authUser.id,
+          },
+          include: {
+            account: { select: { id: true, name: true } },
+            category: { select: { id: true, name: true, color: true } },
+            recorder: { select: { id: true, name: true } },
+            verifier: { select: { id: true, name: true } },
+            donor: { select: { id: true, name: true } },
+          },
+        }),
+      ];
+      // If INCOME with donorId, increment donor's totalDonated
+      if (existing.type === TransactionType.INCOME && existing.donorId) {
+        ops.push(
+          prisma.donor.update({
+            where: { id: existing.donorId },
+            data: {
+              verificationStatus: DonorVerificationStatus.REJECTED,
+              updatedBy: authUser.id,
+            },
+          }) as never
+        );
+      }
+
+      const [transaction] = await prisma.$transaction(ops);
 
       await writeAuditLog({
         userId: authUser.id,

@@ -12,6 +12,7 @@ import {
   Clock,
   ShieldCheck,
 } from "lucide-react";
+import { MonthPicker } from "@/components/shared/month-picker";
 import { usePermissions } from "@/hooks/use-permission";
 import { PermissionGuard } from "@/components/shared/permission-guard";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -85,6 +86,15 @@ export function TransactionsTable() {
   const [filterType, setFilterType] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterAccount, setFilterAccount] = useState<string>("");
+  const now = new Date();
+  const [filterYear, setFilterYear] = useState(now.getFullYear());
+  const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1);
+
+  // Compute date range from month
+  const dateFrom =
+    new Date(filterYear, filterMonth - 1, 1).toISOString().split("T")[0] ?? "";
+  const dateTo =
+    new Date(filterYear, filterMonth, 0).toISOString().split("T")[0] ?? "";
 
   // Load accounts and categories for filters
   const { data: accountsData } = useCashAccounts({ limit: 100 });
@@ -101,6 +111,8 @@ export function TransactionsTable() {
       verificationStatus: filterStatus as TransactionStatus,
     }),
     ...(filterAccount && { accountId: filterAccount }),
+    dateFrom,
+    dateTo,
   });
 
   const handleSearch = (value: string) => {
@@ -133,6 +145,20 @@ export function TransactionsTable() {
 
   return (
     <>
+      {/* Month Filter */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-500">Periode:</p>
+        <MonthPicker
+          year={filterYear}
+          month={filterMonth}
+          onChange={(y, m) => {
+            setFilterYear(y);
+            setFilterMonth(m);
+            setPage(1);
+          }}
+        />
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

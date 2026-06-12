@@ -32,6 +32,7 @@ export type CashTransactionWithRelations = {
   category: { id: string; name: string; color: string | null } | null;
   recorder: { id: string; name: string };
   verifier: { id: string; name: string } | null;
+  donor: { id: string; name: string } | null;
 };
 
 export const cashTransactionKeys = {
@@ -48,6 +49,7 @@ export type CreateCashTransactionPayload = {
   amount: number;
   description: string;
   referenceNo?: string | null;
+  donorId?: string | null;
   transactionDate: string;
   notes?: string | null;
 };
@@ -165,6 +167,8 @@ export function useVerifyCashTransaction(id: string) {
       });
       // Also invalidate cash accounts since balance may have changed
       void queryClient.invalidateQueries({ queryKey: ["cashAccounts"] });
+      // Also invalidate donors since totalDonated may have changed
+      void queryClient.invalidateQueries({ queryKey: ["donors"] });
       toast.success(
         variables.action === "approve"
           ? "Transaksi berhasil disetujui."

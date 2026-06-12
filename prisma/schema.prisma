@@ -56,6 +56,12 @@ enum TransactionStatus {
   REJECTED
 }
 
+enum DonorVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -222,6 +228,7 @@ model Organization {
   memberStatusTypes    MemberStatusType[]
   transactionCategories TransactionCategory[]
   cashTransactions     CashTransaction[]
+  donors               Donor[]
 
   @@index([name])
   @@map("organization")
@@ -322,6 +329,7 @@ model CashTransaction {
   category            TransactionCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   recorder            User                  @relation("CashTransactionRecorder", fields: [recordedBy], references: [id])
   verifier            User?                 @relation("CashTransactionVerifier", fields: [verifiedBy], references: [id])
+  donor               Donor?                @relation(fields: [donorId], references: [id], onDelete: SetNull)
 
   @@index([accountId])
   @@index([organizationId])
@@ -378,9 +386,39 @@ model Member {
   // Relations
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   status          MemberStatusType? @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  donorRecords    Donor[]
 
   @@index([organizationId])
   @@index([statusId])
   @@index([organizationId, statusId])
   @@map("members")
+}
+
+model Donor {
+  id              String   @id @default(uuid())
+  organizationId  String
+  name            String
+  phone           String?
+  email           String?
+  address         String?
+  totalDonated    Decimal  @default(0) @db.Decimal(15, 2)
+  isMember        Boolean  @default(false)
+  memberId        String?
+  verificationStatus  DonorVerificationStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  member          Member?           @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  transactions    CashTransaction[]
+
+  @@index([organizationId])
+  @@index([memberId])
+  @@index([name])
+  @@map("donors")
 }

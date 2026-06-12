@@ -95,6 +95,11 @@ async function main(): Promise<void> {
       subject: "cashTransactionCategory",
       description: "Delete transaction category data",
     },
+    // Donor
+    { action: "create", subject: "donor", description: "Create new donors" },
+    { action: "read", subject: "donor", description: "View donor data" },
+    { action: "update", subject: "donor", description: "Update donor data" },
+    { action: "delete", subject: "donor", description: "Delete donors" },
   ];
 
   const createdPermissions = await Promise.all(
