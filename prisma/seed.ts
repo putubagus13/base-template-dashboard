@@ -166,6 +166,38 @@ async function main(): Promise<void> {
       subject: "attendancePointConfig",
       description: "Update point config",
     },
+    // Dues Agenda (Iuran Anggota)
+    {
+      action: "create",
+      subject: "duesAgenda",
+      description: "Create dues agenda",
+    },
+    {
+      action: "read",
+      subject: "duesAgenda",
+      description: "View dues agenda",
+    },
+    {
+      action: "update",
+      subject: "duesAgenda",
+      description: "Update dues agenda",
+    },
+    {
+      action: "delete",
+      subject: "duesAgenda",
+      description: "Delete dues agenda",
+    },
+    // Member Dues Payment
+    {
+      action: "read",
+      subject: "memberDuesPayment",
+      description: "View member dues payment",
+    },
+    {
+      action: "update",
+      subject: "memberDuesPayment",
+      description: "Update member dues payment",
+    },
   ];
 
   const createdPermissions = await Promise.all(

@@ -27,6 +27,9 @@ export const ROUTES = {
     donors: "/dashboard/finance/donors",
     donations: "/dashboard/finance/donations",
     financeSummary: "/dashboard/finance/summary",
+    // Dues (Iuran Anggota)
+    duesAgendas: "/dashboard/finance/dues",
+    duesAgendaDetail: (id: string) => `/dashboard/finance/dues/${id}`,
     // Attendance
     meetings: "/dashboard/attendance/meetings",
     meetingDetail: (id: string) => `/dashboard/attendance/meetings/${id}`,
@@ -78,6 +81,15 @@ export const ROUTES = {
     // Attendance
     attendancePointConfig: "/api/attendance-point-config",
     attendanceLeaderboard: "/api/attendance/leaderboard",
+    // Dues (Iuran Anggota)
+    duesAgendas: "/api/dues-agendas",
+    duesAgenda: (id: string) => `/api/dues-agendas/${id}`,
+    duesAgendaGeneratePayments: (id: string) =>
+      `/api/dues-agendas/${id}/generate-payments`,
+    memberDuesPayments: (agendaId: string) =>
+      `/api/dues-agendas/${agendaId}/payments`,
+    memberDuesPayment: (id: string) => `/api/member-dues-payments/${id}`,
+    memberDuesPaymentPay: (id: string) => `/api/member-dues-payments/${id}/pay`,
   },
 } as const;
 

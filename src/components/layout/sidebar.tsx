@@ -25,6 +25,7 @@ import {
   Tag,
   Settings2,
   Trophy,
+  ReceiptText,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
@@ -93,6 +94,12 @@ const NAV_ITEMS: NavItem[] = [
         href: "/dashboard/finance/donations",
         icon: HandCoins,
         permission: "create:cashTransaction",
+      },
+      {
+        label: "Iuran Anggota",
+        href: "/dashboard/finance/dues",
+        icon: ReceiptText,
+        permission: "read:duesAgenda",
       },
     ],
   },

@@ -53,3 +53,13 @@ export type {
   BulkAttendanceInput,
   AttendanceLeaderboardEntry,
 } from "./attendance";
+export type {
+  ListDuesAgendaQueryParam,
+  DuesAgendaProfile,
+  DuesAgendaRateProfile,
+  DuesPaymentSummary,
+  MemberDuesPaymentProfile,
+  CreateDuesAgendaPayload,
+  UpdateDuesAgendaPayload,
+  PayDuesPaymentPayload,
+} from "./dues";
