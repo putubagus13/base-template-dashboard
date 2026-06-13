@@ -62,6 +62,19 @@ enum DonorVerificationStatus {
   REJECTED
 }
 
+enum MeetingStatus {
+  INCOMING
+  LIVE
+  DONE
+}
+
+enum AttendanceStatus {
+  HADIR
+  IZIN
+  TIDAK_HADIR
+  SAKIT
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -229,6 +242,9 @@ model Organization {
   transactionCategories TransactionCategory[]
   cashTransactions     CashTransaction[]
   donors               Donor[]
+  meetingTypes         MeetingType[]
+  meetings             Meeting[]
+  attendancePointConfigs AttendancePointConfig[]
 
   @@index([name])
   @@map("organization")
@@ -387,6 +403,7 @@ model Member {
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   status          MemberStatusType? @relation(fields: [statusId], references: [id], onDelete: SetNull)
   donorRecords    Donor[]
+  attendances     Attendance[]
 
   @@index([organizationId])
   @@index([statusId])
@@ -421,4 +438,93 @@ model Donor {
   @@index([memberId])
   @@index([name])
   @@map("donors")
+}
+
+model MeetingType {
+  id              String   @id @default(uuid())
+  organizationId  String
+  name            String
+  color           String?
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  meetings        Meeting[]
+
+  @@index([organizationId])
+  @@index([name])
+  @@map("meeting_types")
+}
+
+model AttendancePointConfig {
+  id              String   @id @default(uuid())
+  organizationId  String
+  status          AttendanceStatus
+  points          Int      @default(0)
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, status])
+  @@index([organizationId])
+  @@map("attendance_point_configs")
+}
+
+model Meeting {
+  id              String        @id @default(uuid())
+  organizationId  String
+  meetingTypeId   String
+  title           String
+  description     String?
+  scheduledAt     DateTime
+  status          MeetingStatus @default(INCOMING)
+  discussionNotes String?
+  createdAt       DateTime      @default(now())
+  createdBy       String?
+  updatedAt       DateTime      @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  meetingType     MeetingType  @relation(fields: [meetingTypeId], references: [id], onDelete: Cascade)
+  attendances     Attendance[]
+
+  @@index([organizationId])
+  @@index([meetingTypeId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@map("meetings")
+}
+
+model Attendance {
+  id              String            @id @default(uuid())
+  meetingId       String
+  memberId        String
+  status          AttendanceStatus
+  points          Int               @default(0)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  createdBy       String?
+  updatedAt       DateTime          @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  meeting         Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  member          Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, memberId])
+  @@index([meetingId])
+  @@index([memberId])
+  @@map("attendances")
 }

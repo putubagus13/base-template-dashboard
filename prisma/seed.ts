@@ -100,6 +100,72 @@ async function main(): Promise<void> {
     { action: "read", subject: "donor", description: "View donor data" },
     { action: "update", subject: "donor", description: "Update donor data" },
     { action: "delete", subject: "donor", description: "Delete donors" },
+    // Meeting
+    {
+      action: "create",
+      subject: "meeting",
+      description: "Create new meetings",
+    },
+    { action: "read", subject: "meeting", description: "View meeting data" },
+    {
+      action: "update",
+      subject: "meeting",
+      description: "Update meeting data",
+    },
+    { action: "delete", subject: "meeting", description: "Delete meetings" },
+    // Meeting Type
+    {
+      action: "create",
+      subject: "meetingType",
+      description: "Create meeting types",
+    },
+    {
+      action: "read",
+      subject: "meetingType",
+      description: "View meeting types",
+    },
+    {
+      action: "update",
+      subject: "meetingType",
+      description: "Update meeting types",
+    },
+    {
+      action: "delete",
+      subject: "meetingType",
+      description: "Delete meeting types",
+    },
+    // Attendance
+    {
+      action: "create",
+      subject: "attendance",
+      description: "Create attendance records",
+    },
+    {
+      action: "read",
+      subject: "attendance",
+      description: "View attendance data",
+    },
+    {
+      action: "update",
+      subject: "attendance",
+      description: "Update attendance records",
+    },
+    {
+      action: "delete",
+      subject: "attendance",
+      description: "Delete attendance records",
+    },
+    // Attendance Point Config
+    {
+      action: "read",
+      subject: "attendancePointConfig",
+      description: "View point config",
+    },
+    {
+      action: "update",
+      subject: "attendancePointConfig",
+      description: "Update point config",
+    },
   ];
 
   const createdPermissions = await Promise.all(
@@ -280,6 +346,37 @@ async function main(): Promise<void> {
   );
 
   console.log(`✅ Created ${memberStatusTypes.length} member status types`);
+
+  // ─── Default Attendance Point Config ────────────────────────
+  const defaultPointConfigs = [
+    { status: "HADIR" as const, points: 10 },
+    { status: "IZIN" as const, points: 5 },
+    { status: "SAKIT" as const, points: 5 },
+    { status: "TIDAK_HADIR" as const, points: 0 },
+  ];
+
+  await Promise.all(
+    defaultPointConfigs.map((config) =>
+      prisma.attendancePointConfig.upsert({
+        where: {
+          organizationId_status: {
+            organizationId: organization.id,
+            status: config.status,
+          },
+        },
+        update: {},
+        create: {
+          organizationId: organization.id,
+          status: config.status,
+          points: config.points,
+        },
+      })
+    )
+  );
+
+  console.log(
+    `✅ Created ${defaultPointConfigs.length} attendance point configs`
+  );
   console.log("✨ Seeding completed!");
 }
 

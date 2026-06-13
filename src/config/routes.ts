@@ -27,6 +27,12 @@ export const ROUTES = {
     donors: "/dashboard/finance/donors",
     donations: "/dashboard/finance/donations",
     financeSummary: "/dashboard/finance/summary",
+    // Attendance
+    meetings: "/dashboard/attendance/meetings",
+    meetingDetail: (id: string) => `/dashboard/attendance/meetings/${id}`,
+    meetingTypes: "/dashboard/attendance/meeting-types",
+    attendancePointConfig: "/dashboard/attendance/point-config",
+    attendanceLeaderboard: "/dashboard/attendance/leaderboard",
   },
 
   // API
@@ -62,6 +68,16 @@ export const ROUTES = {
     donorLeaderboard: "/api/donors/leaderboard",
     financeSummary: "/api/finance/summary",
     memberSearch: "/api/members/search",
+    // Meeting
+    meetingTypes: "/api/meeting-types",
+    meetingType: (id: string) => `/api/meeting-types/${id}`,
+    meetings: "/api/meetings",
+    meeting: (id: string) => `/api/meetings/${id}`,
+    meetingAttendance: (meetingId: string) =>
+      `/api/meetings/${meetingId}/attendance`,
+    // Attendance
+    attendancePointConfig: "/api/attendance-point-config",
+    attendanceLeaderboard: "/api/attendance/leaderboard",
   },
 } as const;
 

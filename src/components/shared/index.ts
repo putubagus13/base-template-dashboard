@@ -11,3 +11,4 @@ export { PageHeader } from "./page-header";
 export { PermissionGuard } from "./permission-guard";
 export { SearchBar } from "./search-bar";
 export { StatusBadge, StatusBadgeMember } from "./status-badge";
+export { MonthPicker } from "./month-picker";

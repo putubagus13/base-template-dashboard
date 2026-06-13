@@ -41,3 +41,15 @@ export type { ListCashAccountQueryParam } from "./cash-account";
 export type { ListTransactionCategoryQueryParam } from "./transaction-category";
 export type { ListCashTransactionQueryParam } from "./cash-transaction";
 export type { ListDonorQueryParam } from "./donor";
+export type {
+  ListMeetingQueryParam,
+  ListMeetingTypeQueryParam,
+  ListAttendanceLeaderboardParam,
+  MeetingTypeProfile,
+  MeetingProfile,
+  MeetingSummary,
+  AttendanceProfile,
+  AttendancePointConfigProfile,
+  BulkAttendanceInput,
+  AttendanceLeaderboardEntry,
+} from "./attendance";

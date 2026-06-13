@@ -20,6 +20,11 @@ import {
   Heart,
   HandCoins,
   BarChart3,
+  CalendarCheck,
+  CalendarDays,
+  Tag,
+  Settings2,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
@@ -88,6 +93,36 @@ const NAV_ITEMS: NavItem[] = [
         href: "/dashboard/finance/donations",
         icon: HandCoins,
         permission: "create:cashTransaction",
+      },
+    ],
+  },
+  {
+    label: "Absensi",
+    icon: CalendarCheck,
+    children: [
+      {
+        label: "Rapat",
+        href: "/dashboard/attendance/meetings",
+        icon: CalendarDays,
+        permission: "read:meeting",
+      },
+      {
+        label: "Tipe Rapat",
+        href: "/dashboard/attendance/meeting-types",
+        icon: Tag,
+        permission: "read:meetingType",
+      },
+      {
+        label: "Poin Absensi",
+        href: "/dashboard/attendance/point-config",
+        icon: Settings2,
+        permission: "read:attendancePointConfig",
+      },
+      {
+        label: "Leaderboard",
+        href: "/dashboard/attendance/leaderboard",
+        icon: Trophy,
+        permission: "read:attendance",
       },
     ],
   },
