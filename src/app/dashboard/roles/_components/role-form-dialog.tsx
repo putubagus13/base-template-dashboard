@@ -134,7 +134,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
       size="lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             label="Nama Peran"
             htmlFor="role-name"
@@ -232,7 +232,7 @@ export function RoleFormDialog({ open, onClose, role }: RoleFormDialogProps) {
           )}
         </div>
 
-        <DialogFooter className="-mx-6 -mb-5 mt-2">
+        <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
           <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>

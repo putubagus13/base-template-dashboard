@@ -22,10 +22,10 @@ type DialogProps = {
 };
 
 const SIZE_MAP: Record<DialogSize, string> = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-lg",
-  xl: "max-w-2xl",
+  sm: "sm:max-w-sm",
+  md: "sm:max-w-md",
+  lg: "sm:max-w-lg",
+  xl: "sm:max-w-2xl",
 };
 
 export function Dialog({
@@ -88,16 +88,17 @@ export function Dialog({
       ref={dialogRef}
       onClick={handleDialogClick}
       className={cn(
-        "w-full rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
-        "mx-4 open:animate-fade-in",
+        "fixed inset-0 m-auto w-[calc(100%-2rem)] rounded-2xl p-0 shadow-xl",
+        "backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
+        "open:animate-fade-in max-h-[85vh]",
         SIZE_MAP[size],
         className
       )}
     >
-      <div className="flex flex-col">
+      <div className="flex max-h-[85vh] flex-col">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
-          <div>
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-4 py-4 sm:px-6 sm:py-5">
+          <div className="min-w-0">
             <h2 className="text-base font-semibold text-slate-900">{title}</h2>
             {description && (
               <p className="mt-0.5 text-sm text-slate-500">{description}</p>
@@ -105,7 +106,7 @@ export function Dialog({
           </div>
           <button
             onClick={handleClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="shrink-0 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
             aria-label="Close dialog"
           >
             <X className="h-4 w-4" />
@@ -113,7 +114,9 @@ export function Dialog({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5">{children}</div>
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 scrollbar-thin">
+          {children}
+        </div>
       </div>
     </dialog>
   );
@@ -130,7 +133,7 @@ export function DialogFooter({ children, className }: DialogFooterProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 rounded-b-2xl",
+        "flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-6 sm:py-4 rounded-b-2xl",
         className
       )}
     >

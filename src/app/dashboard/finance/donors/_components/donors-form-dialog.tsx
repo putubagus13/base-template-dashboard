@@ -220,7 +220,7 @@ function CreateDonorForm({ onClose }: { onClose: () => void }) {
             />
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               label="Telepon"
               htmlFor="create-phone"
@@ -294,7 +294,7 @@ function CreateDonorForm({ onClose }: { onClose: () => void }) {
         />
       </FormField>
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>
@@ -399,7 +399,7 @@ function EditDonorForm({
             />
           </FormField>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               label="Telepon"
               htmlFor="edit-phone"
@@ -456,7 +456,7 @@ function EditDonorForm({
         />
       </FormField>
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>

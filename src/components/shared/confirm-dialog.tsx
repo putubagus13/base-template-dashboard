@@ -42,7 +42,7 @@ export function ConfirmDialog({
   return (
     <Dialog open={open} onClose={onClose} title={title} size="sm">
       <p className="text-sm text-slate-600">{description}</p>
-      <DialogFooter className="mt-4 -mx-6 -mb-5 rounded-b-2xl">
+      <DialogFooter className="mt-4 -mx-4 -mb-4 sm:-mx-6 sm:-mb-5 rounded-b-2xl">
         <Button variant="outline" onClick={onClose} disabled={isLoading}>
           {cancelLabel}
         </Button>

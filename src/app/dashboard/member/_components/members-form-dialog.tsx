@@ -133,7 +133,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Nama Lengkap"
           htmlFor="fullName"
@@ -163,7 +163,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jenis Kelamin"
           htmlFor="gender"
@@ -204,7 +204,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
         />
       </FormField>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Telepon"
           htmlFor="phone"
@@ -230,7 +230,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jabatan"
           htmlFor="position"
@@ -291,7 +291,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
         }
       />
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>
@@ -358,7 +358,7 @@ function EditMemberForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Nama Lengkap"
           htmlFor="edit-fullName"
@@ -388,7 +388,7 @@ function EditMemberForm({
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jenis Kelamin"
           htmlFor="edit-gender"
@@ -433,7 +433,7 @@ function EditMemberForm({
         />
       </FormField>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Telepon"
           htmlFor="edit-phone"
@@ -459,7 +459,7 @@ function EditMemberForm({
         </FormField>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jabatan"
           htmlFor="edit-position"
@@ -524,7 +524,7 @@ function EditMemberForm({
         }
       />
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>

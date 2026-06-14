@@ -177,7 +177,7 @@ export function TransactionVerifyDialog({ open, onClose, transaction }: Props) {
         )}
       </div>
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={handleClose}>
           Batal
         </Button>

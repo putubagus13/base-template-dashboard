@@ -71,7 +71,7 @@ export function DuesPaymentDialog({ payment, agendaTitle, onClose }: Props) {
       size="md"
     >
       <div className="mb-5 rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
           <div>
             <p className="text-slate-500">Agenda</p>
             <p className="font-medium text-slate-800">{agendaTitle}</p>
@@ -148,7 +148,7 @@ export function DuesPaymentDialog({ payment, agendaTitle, onClose }: Props) {
           sudah terverifikasi dan menambah saldo akun kas.
         </div>
 
-        <DialogFooter className="-mx-6 -mb-5 mt-4">
+        <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-4">
           <Button
             type="button"
             variant="outline"

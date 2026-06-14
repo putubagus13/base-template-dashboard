@@ -249,7 +249,7 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
         </FormField>
 
         {/* Type + Amount row */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             label="Tipe Iuran"
             htmlFor="type"
@@ -289,7 +289,7 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
         </div>
 
         {/* Period */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="Bulan" htmlFor="periodMonth">
             <Select
               id="periodMonth"
@@ -373,14 +373,14 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
                 return (
                   <div
                     key={rate.memberStatusTypeId}
-                    className="flex items-center gap-3 rounded-lg border border-slate-200 p-3"
+                    className="grid grid-cols-1 gap-2 sm:flex sm:items-center sm:gap-3 rounded-lg border border-slate-200 p-3"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-800 truncate">
                         {st?.name ?? "Unknown"}
                       </p>
                     </div>
-                    <div className="w-28">
+                    <div className="w-full sm:w-28">
                       <Input
                         type="number"
                         min={0}
@@ -396,7 +396,7 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
                         className="text-right"
                       />
                     </div>
-                    <div className="w-36">
+                    <div className="w-full sm:w-36">
                       <Input
                         type="date"
                         value={rate.effectiveDate}
@@ -430,7 +430,7 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
           </div>
         )}
 
-        <DialogFooter className="-mx-6 -mb-5 mt-6">
+        <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-6">
           <Button
             type="button"
             variant="outline"

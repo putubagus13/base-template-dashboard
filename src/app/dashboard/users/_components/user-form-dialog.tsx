@@ -158,7 +158,7 @@ function CreateUserForm({ onClose }: { onClose: () => void }) {
         )}
       </FormField>
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
@@ -277,7 +277,7 @@ function EditUserForm({
         )}
       </FormField>
 
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>

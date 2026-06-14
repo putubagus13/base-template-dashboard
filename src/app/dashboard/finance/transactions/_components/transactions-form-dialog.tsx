@@ -105,7 +105,7 @@ function CreateForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Tipe Transaksi"
           htmlFor="type"
@@ -137,7 +137,7 @@ function CreateForm({
           />
         </FormField>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jumlah"
           htmlFor="amount"
@@ -213,7 +213,7 @@ function CreateForm({
           {...register("notes")}
         />
       </FormField>
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>
@@ -273,7 +273,7 @@ function EditForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Tipe Transaksi"
           htmlFor="edit-type"
@@ -305,7 +305,7 @@ function EditForm({
           />
         </FormField>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Jumlah"
           htmlFor="edit-amount"
@@ -385,7 +385,7 @@ function EditForm({
           {...register("notes")}
         />
       </FormField>
-      <DialogFooter className="-mx-6 -mb-5 mt-2">
+      <DialogFooter className="-mx-4 -mb-4 sm:-mx-6 sm:-mb-5 mt-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Batal
         </Button>

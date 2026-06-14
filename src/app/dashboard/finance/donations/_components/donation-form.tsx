@@ -275,7 +275,7 @@ export function DonationForm() {
                 />
               </FormField>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormField
                   label="Telepon"
                   htmlFor="phone"
@@ -338,7 +338,7 @@ export function DonationForm() {
           </FormField>
 
           {/* Amount + Date */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               label="Jumlah Donasi"
               htmlFor="amount"
