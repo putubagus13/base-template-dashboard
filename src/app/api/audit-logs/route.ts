@@ -60,7 +60,14 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
-      prisma.auditLog.count({ where }),
+      prisma.auditLog.count({
+        where: {
+          ...where,
+          user: {
+            organizations: { some: { organizationId: orgId } },
+          },
+        },
+      }),
     ]);
 
     const totalPages = Math.ceil(total / limit);

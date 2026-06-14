@@ -89,7 +89,7 @@ export function Dialog({
       onClick={handleDialogClick}
       className={cn(
         "w-full rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
-        "open:animate-fade-in",
+        "mx-4 open:animate-fade-in",
         SIZE_MAP[size],
         className
       )}

@@ -50,7 +50,7 @@ export function StatCard({
         </div>
       </div>
 
-      <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+      <p className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
         {value}
       </p>
 

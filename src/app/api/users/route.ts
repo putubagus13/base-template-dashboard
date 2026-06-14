@@ -5,6 +5,7 @@
 // ============================================================
 
 import { NextRequest } from "next/server";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuthUser, hashPassword } from "@/lib/auth/helpers";
 import { hasPermission } from "@/lib/auth/rbac";
@@ -12,6 +13,7 @@ import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { z } from "zod";
 import { writeAuditLog } from "@/lib/audit";
 import { generateMetadataPagination } from "@/utils/metadata-pagination-generator";
+import { sendInvitationEmail } from "@/lib/email";
 
 const createUserSchema = z.object({
   name: z.string().min(2).max(100),
@@ -112,8 +114,16 @@ export async function POST(request: NextRequest) {
 
     const { name, email, password, roleIds } = result.data;
 
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
+    const existing = await prisma.user.findUnique({
+      where: {
+        email,
+        // status: "ACTIVE",
+        organizations: {
+          some: { organizationId: authUser.activeOrganization.id },
+        },
+      },
+    });
+    if (existing && existing.status === "ACTIVE") {
       return ApiResponseBuilder.conflict(
         "An account with this email already exists."
       );
@@ -131,6 +141,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create invitation token so user can verify email and activate account
+    const inviteToken = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    if (existing && existing.status === "PENDING_VERIFICATION") {
+      await prisma.token.create({
+        data: {
+          userId: existing.id,
+          token: inviteToken,
+          type: "INVITATION",
+          expiresAt,
+          email: existing.email,
+          roleIds,
+          organizationId: authUser.activeOrganization.id,
+        },
+      });
+
+      // Send invitation email with verification link
+      await sendInvitationEmail(existing.email, inviteToken);
+
+      await writeAuditLog({
+        userId: authUser.id,
+        action: "create_user",
+        subject: "user",
+        newValues: result.data,
+        request,
+      });
+
+      return ApiResponseBuilder.success(
+        { ...existing },
+        "User invited successfully. Invitation email sent.",
+        201
+      );
+    }
+
     const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
@@ -138,8 +183,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        status: "ACTIVE",
-        emailVerifiedAt: new Date(),
+        status: "PENDING_VERIFICATION",
         roles: {
           create: roleIds.map((roleId) => ({ roleId })),
         },
@@ -157,6 +201,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create invitation token so user can verify email and activate account
+    // const inviteToken = randomBytes(32).toString("hex");
+    // const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    await prisma.token.create({
+      data: {
+        userId: user.id,
+        token: inviteToken,
+        type: "INVITATION",
+        expiresAt,
+        email: user.email,
+        roleIds,
+        organizationId: authUser.activeOrganization.id,
+      },
+    });
+
+    // Send invitation email with verification link
+    await sendInvitationEmail(user.email, inviteToken);
+
     await writeAuditLog({
       userId: authUser.id,
       action: "create_user",
@@ -167,7 +230,7 @@ export async function POST(request: NextRequest) {
 
     return ApiResponseBuilder.success(
       { ...user, roles: user.roles.map((ur) => ur.role) },
-      "User created successfully.",
+      "User created successfully. Invitation email sent.",
       201
     );
   } catch (error) {

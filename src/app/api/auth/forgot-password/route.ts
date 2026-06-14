@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/prisma";
 import { ApiResponseBuilder, formatZodErrors } from "@/lib/api-response";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { passwordResetLimiter } from "@/lib/rate-limit";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 const GENERIC_MESSAGE =
   "If an account exists with this email, you will receive a password reset link shortly.";
@@ -48,10 +49,8 @@ export async function POST(request: NextRequest) {
       data: { userId: user.id, token, type: "PASSWORD_RESET", expiresAt },
     });
 
-    // TODO: Send reset email
-    // const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`
-    // await sendPasswordResetEmail(user.email, user.name, resetUrl)
-    console.info(`[ForgotPassword] Reset token for ${email}: ${token}`);
+    // Send reset email
+    await sendPasswordResetEmail(user.email, user.name, token);
 
     return ApiResponseBuilder.success(null, GENERIC_MESSAGE);
   } catch (error) {

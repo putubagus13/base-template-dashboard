@@ -40,11 +40,11 @@ export function Pagination({ meta, onPageChange, className }: PaginationProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 px-4 py-3",
+        "flex flex-col items-center gap-3 px-4 py-3 sm:flex-row sm:justify-between",
         className
       )}
     >
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 order-2 sm:order-1">
         Menampilkan{" "}
         <span className="font-medium text-slate-700">
           {from}–{to}
@@ -52,7 +52,7 @@ export function Pagination({ meta, onPageChange, className }: PaginationProps) {
         dari <span className="font-medium text-slate-700">{total}</span> hasil
       </p>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 order-1 sm:order-2">
         <Button
           variant="outline"
           size="icon"

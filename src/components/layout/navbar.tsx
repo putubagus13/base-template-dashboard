@@ -2,12 +2,12 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, ChevronDown, Menu } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useLogout } from "@/hooks/use-auth";
 import { cn } from "@/utils/cn";
 
-export function Navbar() {
+export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
   const user = useAuthStore((s) => s.user);
   const logout = useLogout();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -21,8 +21,16 @@ export function Navbar() {
       .toUpperCase() ?? "??";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
-      <div />
+    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
+      {/* Hamburger - mobile only */}
+      <button
+        onClick={onMenuClick}
+        className="flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+        aria-label="Toggle sidebar"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+      <div className="hidden lg:block" />
 
       {/* User Menu */}
       <div className="relative">

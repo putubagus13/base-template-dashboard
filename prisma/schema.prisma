@@ -30,6 +30,7 @@ enum TokenType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
   REFRESH_TOKEN
+  INVITATION
 }
 
 enum OrganizationStatus {
@@ -197,6 +198,10 @@ model Token {
   type      TokenType
   expiresAt DateTime
   usedAt    DateTime?
+  // Invitation-specific fields (nullable, only for INVITATION type)
+  email     String?
+  roleIds   String[]  // Stored role IDs for invitation
+  organizationId String? // Org context for invitation
   createdAt DateTime  @default(now())
   createdBy   String?
   updatedBy   String?

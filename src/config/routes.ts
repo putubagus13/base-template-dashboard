@@ -11,6 +11,7 @@ export const ROUTES = {
     register: "/auth/register",
     forgotPassword: "/auth/forgot-password",
     resetPassword: "/auth/reset-password",
+    verifyEmail: "/auth/verify-email",
   },
 
   // Dashboard
@@ -47,6 +48,8 @@ export const ROUTES = {
       refresh: "/api/auth/refresh",
       forgotPassword: "/api/auth/forgot-password",
       resetPassword: "/api/auth/reset-password",
+      verifyEmail: "/api/auth/verify-email",
+      validateInvitation: "/api/auth/validate-invitation",
     },
     users: "/api/users",
     user: (id: string) => `/api/users/${id}`,

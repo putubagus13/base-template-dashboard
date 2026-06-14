@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -163,9 +163,20 @@ const BOTTOM_ITEMS: NavItem[] = [
   },
 ];
 
-export function Sidebar() {
+type SidebarProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { can, isSuperAdmin } = usePermissions();
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Track which parent menus are expanded
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(
@@ -279,42 +290,58 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white">
-      {/* Logo */}
-      <div className="flex h-16 items-center border-b border-slate-200 px-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 flex items-center justify-center shrink-0">
-            <Image
-              src={STT_TGD_LOGO.src}
-              alt="Logo"
-              className="object-contain"
-              width={40}
-              height={40}
-            />
-          </div>
-          <div>
-            <span className="text-sm font-semibold text-slate-900 line-clamp-1">
-              STT Tunas Guna Dharma
-            </span>
-            <span className="text-xs font-medium text-slate-400 line-clamp-1">
-              Dashboard
-            </span>
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out lg:static lg:z-auto lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center border-b border-slate-200 px-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+              <Image
+                src={STT_TGD_LOGO.src}
+                alt="Logo"
+                className="object-contain"
+                width={40}
+                height={40}
+              />
+            </div>
+            <div>
+              <span className="text-sm font-semibold text-slate-900 line-clamp-1">
+                STT Tunas Guna Dharma
+              </span>
+              <span className="text-xs font-medium text-slate-400 line-clamp-1">
+                Dashboard
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin">
-        <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-          Main
-        </p>
-        <ul className="space-y-0.5">{NAV_ITEMS.map(renderItem)}</ul>
-      </nav>
+        {/* Main nav */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin">
+          <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+            Main
+          </p>
+          <ul className="space-y-0.5">{NAV_ITEMS.map(renderItem)}</ul>
+        </nav>
 
-      {/* Bottom nav */}
-      <div className="border-t border-slate-200 px-3 py-3">
-        <ul className="space-y-0.5">{BOTTOM_ITEMS.map(renderItem)}</ul>
-      </div>
-    </aside>
+        {/* Bottom nav */}
+        <div className="border-t border-slate-200 px-3 py-3">
+          <ul className="space-y-0.5">{BOTTOM_ITEMS.map(renderItem)}</ul>
+        </div>
+      </aside>
+    </>
   );
 }

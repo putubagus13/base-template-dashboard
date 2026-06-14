@@ -25,9 +25,16 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn("flex items-start justify-between gap-4", className)}>
+    <div
+      className={cn(
+        "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between",
+        className
+      )}
+    >
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
+          {title}
+        </h1>
         {description && (
           <p className="mt-1 text-sm text-slate-500">{description}</p>
         )}
