@@ -50,6 +50,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Determine rememberMe from the stored token's expiry
+    // If expiry > 2 days, user had rememberMe checked
+    const tokenLifespanDays =
+      (storedToken.expiresAt.getTime() - storedToken.createdAt.getTime()) /
+      (1000 * 60 * 60 * 24);
+    const rememberMe = tokenLifespanDays > 2;
+
     // Rotate refresh token (invalidate old, create new)
     const authUser = await buildAuthUser(userId);
     if (!authUser) {
@@ -78,7 +85,7 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    setAuthCookies(newAccessToken, newRefreshToken);
+    setAuthCookies(newAccessToken, newRefreshToken, rememberMe);
 
     return ApiResponseBuilder.success({ user: authUser }, "Token refreshed.");
   } catch (error) {

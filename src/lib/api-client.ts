@@ -1,7 +1,7 @@
 // src/lib/api-client.ts
 // ============================================================
 // API CLIENT
-// Wrapper fetch untuk konsistensi error handling.
+// Wrapper fetch dengan auto-refresh token pada 401.
 // Gunakan ini di semua React Query hooks.
 // ============================================================
 
@@ -24,9 +24,37 @@ class ApiError extends Error {
 
 export { ApiError };
 
+// ─── Refresh lock ────────────────────────────────────────────
+// Prevents concurrent refresh requests — only one refresh runs at a time.
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // credentials: 'same-origin' is default — cookies sent automatically
+      });
+      return res.ok;
+    } catch {
+      return false;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+// ─── Core request function ──────────────────────────────────
+
 async function request<T>(
   url: string,
-  options: RequestOptions = {}
+  options: RequestOptions = {},
+  isRetry = false
 ): Promise<ApiResponse<T>> {
   const { body, ...rest } = options;
 
@@ -38,6 +66,16 @@ async function request<T>(
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
+
+  // If 401 and not already a retry attempt → try refresh then retry
+  if (response.status === 401 && !isRetry) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      // Retry original request with new access token (cookie updated by refresh)
+      return request<T>(url, options, true);
+    }
+    // Refresh failed → let the 401 propagate (middleware will redirect)
+  }
 
   const data: ApiResponse<T> = await response.json();
 

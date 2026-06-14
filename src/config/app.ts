@@ -13,11 +13,11 @@ export const APP_CONFIG = {
 
 export const AUTH_CONFIG = {
   accessTokenExpiry: "15m",
-  ageAccessTokenExpiry: 15 * 60 * 60 * 1000, // 15 minutes in ms
-  refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days in seconds
-  rememberMeExpiry: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-  defaultExpiry: 24 * 60 * 60 * 1000, // 1 day in ms
-  passwordResetExpiry: 60 * 60 * 1000, // 1 hour in ms
+  accessTokenMaxAge: 15 * 60, // 15 minutes in seconds (for cookie maxAge)
+  refreshTokenExpiry: "7d",
+  refreshTokenMaxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+  refreshTokenMaxAgeShort: 24 * 60 * 60, // 1 day in seconds (no remember me)
+  passwordResetMaxAge: 60 * 60, // 1 hour in seconds
   saltRounds: 12,
   cookieNames: {
     accessToken: "access_token",

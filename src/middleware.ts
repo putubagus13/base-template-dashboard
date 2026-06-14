@@ -8,22 +8,6 @@ import { verifyAccessToken } from "@/lib/auth/jwt";
 import { PUBLIC_API_ROUTES, PUBLIC_ROUTES, ROUTES } from "./config/routes";
 import { AUTH_CONFIG } from "./config/app";
 
-// const PUBLIC_ROUTES = [
-//   "/auth/login",
-//   "/auth/register",
-//   "/auth/forgot-password",
-//   "/auth/reset-password",
-// ];
-
-// const PUBLIC_API_ROUTES = [
-//   "/api/auth/login",
-//   "/api/auth/register",
-//   "/api/auth/logout",
-//   "/api/auth/forgot-password",
-//   "/api/auth/reset-password",
-//   "/api/auth/refresh",
-// ];
-
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
 }
@@ -38,6 +22,46 @@ function isStaticAsset(pathname: string): boolean {
     pathname.startsWith("/favicon") ||
     pathname.includes(".")
   );
+}
+
+/**
+ * Attempt silent token refresh via the refresh API.
+ * Returns the Set-Cookie headers from the response on success, or null on failure.
+ */
+async function tryRefreshToken(
+  refreshToken: string,
+  baseUrl: string
+): Promise<string[] | null> {
+  try {
+    const refreshUrl = new URL(ROUTES.api.auth.refresh, baseUrl);
+    const refreshResponse = await fetch(refreshUrl, {
+      method: "POST",
+      headers: {
+        Cookie: `${AUTH_CONFIG.cookieNames.refreshToken}=${refreshToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (refreshResponse.ok) {
+      return refreshResponse.headers.getSetCookie();
+    }
+  } catch {
+    // Refresh failed — fall through
+  }
+  return null;
+}
+
+/**
+ * Build a response that forwards Set-Cookie headers from a refresh response.
+ */
+function buildResponseWithCookies(
+  response: NextResponse,
+  cookies: string[]
+): NextResponse {
+  cookies.forEach((cookie) => {
+    response.headers.append("Set-Cookie", cookie);
+  });
+  return response;
 }
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
@@ -72,75 +96,65 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const accessToken = request.cookies.get(
       AUTH_CONFIG.cookieNames.accessToken
     )?.value;
-    const dest = accessToken ? ROUTES.dashboard.home : ROUTES.auth.login;
-    try {
-      if (accessToken) await verifyAccessToken(accessToken);
-      return NextResponse.redirect(new URL(dest, request.url));
-    } catch {
-      return NextResponse.redirect(new URL(ROUTES.auth.login, request.url));
+    if (accessToken) {
+      try {
+        await verifyAccessToken(accessToken);
+        return NextResponse.redirect(
+          new URL(ROUTES.dashboard.home, request.url)
+        );
+      } catch {
+        // Token expired/invalid — redirect to login
+      }
     }
+    return NextResponse.redirect(new URL(ROUTES.auth.login, request.url));
   }
 
   // ─── Protected routes ────────────────────────────────────────
   const accessToken = request.cookies.get(
     AUTH_CONFIG.cookieNames.accessToken
   )?.value;
+  const refreshToken = request.cookies.get(
+    AUTH_CONFIG.cookieNames.refreshToken
+  )?.value;
 
-  if (!accessToken) {
-    // Try silent refresh via refresh token
-    const refreshToken = request.cookies.get(
-      AUTH_CONFIG.cookieNames.refreshToken
-    )?.value;
-    if (refreshToken) {
-      try {
-        const refreshUrl = new URL(ROUTES.api.auth.refresh, request.url);
-        const refreshResponse = await fetch(refreshUrl, {
-          method: "POST",
-          headers: { Cookie: `refresh_token=${refreshToken}` },
-        });
+  // Case 1: Valid access token → proceed with user context
+  if (accessToken) {
+    try {
+      const payload = await verifyAccessToken(accessToken);
 
-        if (refreshResponse.ok) {
-          const response = NextResponse.next();
-          refreshResponse.headers.getSetCookie().forEach((cookie) => {
-            response.headers.append("Set-Cookie", cookie);
-          });
-          return response;
-        }
-      } catch {
-        // Refresh failed
-      }
+      // Inject user context into request headers for Server Components
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set("x-user-id", payload.sub);
+      requestHeaders.set("x-user-email", payload.email);
+      requestHeaders.set("x-user-roles", JSON.stringify(payload.roles));
+      requestHeaders.set(
+        "x-user-permissions",
+        JSON.stringify(payload.permissions)
+      );
+
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    } catch {
+      // Access token expired/invalid → try refresh below
     }
-
-    // No valid tokens — redirect to login
-    const loginUrl = new URL(ROUTES.auth.login, request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
   }
 
-  // Verify access token
-  try {
-    const payload = await verifyAccessToken(accessToken);
-
-    // Inject user context into request headers for Server Components
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-user-id", payload.sub);
-    requestHeaders.set("x-user-email", payload.email);
-    requestHeaders.set("x-user-roles", JSON.stringify(payload.roles));
-    requestHeaders.set(
-      "x-user-permissions",
-      JSON.stringify(payload.permissions)
-    );
-
-    return NextResponse.next({ request: { headers: requestHeaders } });
-  } catch {
-    // Token expired or invalid
-    const loginUrl = new URL(ROUTES.auth.login, request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.delete(AUTH_CONFIG.cookieNames.accessToken);
-    return response;
+  // Case 2: Access token missing or expired → try silent refresh
+  if (refreshToken) {
+    const newCookies = await tryRefreshToken(refreshToken, request.url);
+    if (newCookies) {
+      // Refresh succeeded → continue with new tokens set via cookies
+      return buildResponseWithCookies(NextResponse.next(), newCookies);
+    }
   }
+
+  // Case 3: No valid tokens — redirect to login
+  const loginUrl = new URL(ROUTES.auth.login, request.url);
+  loginUrl.searchParams.set("callbackUrl", pathname);
+
+  const response = NextResponse.redirect(loginUrl);
+  response.cookies.delete(AUTH_CONFIG.cookieNames.accessToken);
+  response.cookies.delete(AUTH_CONFIG.cookieNames.refreshToken);
+  return response;
 }
 
 export const config = {

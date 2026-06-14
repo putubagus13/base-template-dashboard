@@ -41,7 +41,7 @@ export async function setAuthCookies(
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: AUTH_CONFIG.ageAccessTokenExpiry, // 15 minutes in ms
+    maxAge: AUTH_CONFIG.accessTokenMaxAge, // 15 minutes in seconds
     path: "/",
   });
 
@@ -49,7 +49,9 @@ export async function setAuthCookies(
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: rememberMe ? AUTH_CONFIG.rememberMeExpiry : 24 * 60 * 60 * 1000, // 7 days or 1 day
+    maxAge: rememberMe
+      ? AUTH_CONFIG.refreshTokenMaxAge // 7 days
+      : AUTH_CONFIG.refreshTokenMaxAgeShort, // 1 day
     path: "/",
   });
 }
