@@ -421,8 +421,7 @@ export function DuesAgendaDetail({ agendaId }: { agendaId: string }) {
                   <TableCell>
                     <div className="flex justify-end">
                       {payment.status === "UNPAID" &&
-                        can("update:memberDuesPayment") &&
-                        Number(payment.amount) > 0 && (
+                        can("update:memberDuesPayment") && (
                           <Button
                             variant="outline"
                             size="sm"

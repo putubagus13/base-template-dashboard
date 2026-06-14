@@ -128,70 +128,70 @@ export async function PATCH(
 
     const { rates, ...updateData } = result.data;
 
-    // If rates provided, replace existing rates
-    let ratesUpdate = {};
-    if (rates) {
-      // Soft delete old rates
-      ratesUpdate = {
-        rates: {
-          updateMany: {
-            where: { duesAgendaId: id },
-            data: { deletedAt: new Date() },
-          },
+    const agenda = await prisma.$transaction(async (tx) => {
+      // If rates provided, hard-delete old rates then create new ones
+      // (soft-delete won't work due to @@unique constraint on duesAgendaId+memberStatusTypeId)
+      if (rates) {
+        await tx.duesAgendaRate.deleteMany({
+          where: { duesAgendaId: id },
+        });
+
+        if (rates.length > 0) {
+          await tx.duesAgendaRate.createMany({
+            data: rates.map((r) => ({
+              duesAgendaId: id,
+              memberStatusTypeId: r.memberStatusTypeId,
+              amount: r.amount,
+              effectiveDate: new Date(r.effectiveDate),
+              createdBy: authUser.id,
+            })),
+          });
+        }
+      }
+
+      return tx.duesAgenda.update({
+        where: { id },
+        data: {
+          ...(updateData.title !== undefined
+            ? { title: updateData.title }
+            : {}),
+          ...(updateData.description !== undefined
+            ? { description: updateData.description }
+            : {}),
+          ...(updateData.type !== undefined ? { type: updateData.type } : {}),
+          ...(updateData.amount !== undefined
+            ? { amount: updateData.amount }
+            : {}),
+          ...(updateData.periodMonth !== undefined
+            ? { periodMonth: updateData.periodMonth }
+            : {}),
+          ...(updateData.periodYear !== undefined
+            ? { periodYear: updateData.periodYear }
+            : {}),
+          ...(updateData.dueDate !== undefined
+            ? {
+                dueDate: updateData.dueDate
+                  ? new Date(updateData.dueDate)
+                  : null,
+              }
+            : {}),
+          ...(updateData.isActive !== undefined
+            ? { isActive: updateData.isActive }
+            : {}),
+          updatedBy: authUser.id,
         },
-      };
-
-      // Create new rates
-      const newRates = rates.map((r) => ({
-        duesAgendaId: id,
-        memberStatusTypeId: r.memberStatusTypeId,
-        amount: r.amount,
-        effectiveDate: new Date(r.effectiveDate),
-        createdBy: authUser.id,
-      }));
-
-      await prisma.duesAgendaRate.createMany({ data: newRates });
-    }
-
-    const agenda = await prisma.duesAgenda.update({
-      where: { id },
-      data: {
-        ...(updateData.title !== undefined ? { title: updateData.title } : {}),
-        ...(updateData.description !== undefined
-          ? { description: updateData.description }
-          : {}),
-        ...(updateData.type !== undefined ? { type: updateData.type } : {}),
-        ...(updateData.amount !== undefined
-          ? { amount: updateData.amount }
-          : {}),
-        ...(updateData.periodMonth !== undefined
-          ? { periodMonth: updateData.periodMonth }
-          : {}),
-        ...(updateData.periodYear !== undefined
-          ? { periodYear: updateData.periodYear }
-          : {}),
-        ...(updateData.dueDate !== undefined
-          ? {
-              dueDate: updateData.dueDate ? new Date(updateData.dueDate) : null,
-            }
-          : {}),
-        ...(updateData.isActive !== undefined
-          ? { isActive: updateData.isActive }
-          : {}),
-        updatedBy: authUser.id,
-        ...ratesUpdate,
-      },
-      include: {
-        rates: {
-          where: { deletedAt: null },
-          include: {
-            memberStatusType: {
-              select: { id: true, name: true, color: true },
+        include: {
+          rates: {
+            where: { deletedAt: null },
+            include: {
+              memberStatusType: {
+                select: { id: true, name: true, color: true },
+              },
             },
           },
+          _count: { select: { payments: true, rates: true } },
         },
-        _count: { select: { payments: true, rates: true } },
-      },
+      });
     });
 
     await writeAuditLog({
