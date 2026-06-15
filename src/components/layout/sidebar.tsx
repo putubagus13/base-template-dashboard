@@ -30,7 +30,7 @@ import {
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
 import type { PermissionString } from "@/types/rbac";
-import { STT_TGD_LOGO } from "../../../public";
+import { STT_PATRA_KAYONI } from "../../../public";
 import Image from "next/image";
 
 type NavItem = {
@@ -311,7 +311,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 flex items-center justify-center shrink-0">
               <Image
-                src={STT_TGD_LOGO.src}
+                src={STT_PATRA_KAYONI.src}
                 alt="Logo"
                 className="object-contain"
                 width={40}
@@ -320,7 +320,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
             <div>
               <span className="text-sm font-semibold text-slate-900 line-clamp-1">
-                STT Tunas Guna Dharma
+                STT Patra Kayoni
               </span>
               <span className="text-xs font-medium text-slate-400 line-clamp-1">
                 Dashboard

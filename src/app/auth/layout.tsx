@@ -1,6 +1,6 @@
 // src/app/auth/layout.tsx
 import type { Metadata } from "next";
-import { STT_TGD_LOGO } from "../../../public";
+import { STT_PATRA_KAYONI } from "../../../public";
 import Image from "next/image";
 
 export const metadata: Metadata = {
@@ -61,7 +61,7 @@ export default function AuthLayout({
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 ">
             <Image
-              src={STT_TGD_LOGO.src}
+              src={STT_PATRA_KAYONI.src}
               alt="Logo"
               className="object-contain"
               width={100}
@@ -69,7 +69,7 @@ export default function AuthLayout({
             />
           </div>
           <h1 className="font-display text-2xl font-bold text-brand-700">
-            STT. Tunas Guna Dharma
+            STT. Patra Kayoni
           </h1>
           <p className="text-brand-700 text-sm mt-1">
             Sistem Manajemen Organisasi

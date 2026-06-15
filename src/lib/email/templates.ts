@@ -3,7 +3,7 @@
 // Reusable HTML email templates
 // ============================================================
 
-const APP_NAME = "STT Tunas Guna Dharma";
+const APP_NAME = "STT Patra Kayoni";
 const BASE_STYLE = `
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; margin: 0; padding: 0; }
   .container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }

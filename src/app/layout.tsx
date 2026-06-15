@@ -17,10 +17,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "STT Tunas Guna Dharma",
-    template: "%s | STT Tunas Guna Dharma",
+    default: "STT Patra Kayoni",
+    template: "%s | STT Patra Kayoni",
   },
-  description: "Sistem Manajemen Organisasi STT Tunas Guna Dharma",
+  description: "Sistem Manajemen Organisasi STT Patra Kayoni",
   // icons: { icon: '/favicon.ico' },
   icons: {
     icon: [
