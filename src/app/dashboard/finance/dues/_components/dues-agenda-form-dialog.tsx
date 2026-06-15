@@ -11,10 +11,11 @@ import { Button, Input, Select, Textarea, FormField } from "@/components/ui";
 import { useCreateDuesAgenda, useUpdateDuesAgenda } from "@/hooks/use-dues";
 import { useMemberStatusType } from "@/hooks/use-member-status-type";
 import type { DuesAgendaProfile } from "@/types";
+import { toLocalDateString } from "@/utils";
 
 // ─── Schema ──────────────────────────────────────────────────
 
-const todayStr = () => new Date().toISOString().split("T")[0] ?? "";
+const todayStr = () => toLocalDateString();
 
 const duesAgendaSchema = z.object({
   title: z.string().min(2, "Judul minimal 2 karakter"),
@@ -109,18 +110,14 @@ export function DuesAgendaFormDialog({ open, onClose, agenda }: Props) {
         amount: agenda.amount ?? 0,
         periodMonth: agenda.periodMonth,
         periodYear: agenda.periodYear,
-        dueDate: agenda.dueDate
-          ? new Date(agenda.dueDate).toISOString().split("T")[0]
-          : "",
+        dueDate: agenda.dueDate ? toLocalDateString(agenda.dueDate) : "",
       });
       if (agenda.rates) {
         setRates(
           agenda.rates.map((r) => ({
             memberStatusTypeId: r.memberStatusTypeId,
             amount: Number(r.amount),
-            effectiveDate:
-              new Date(r.effectiveDate).toISOString().split("T")[0] ??
-              todayStr(),
+            effectiveDate: toLocalDateString(r.effectiveDate) || todayStr(),
           }))
         );
       }

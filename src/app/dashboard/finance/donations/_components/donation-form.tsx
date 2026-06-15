@@ -17,10 +17,11 @@ import { useCreateCashTransaction } from "@/hooks/use-cash-transactions";
 import { useState, useEffect, useRef } from "react";
 import { MemberSearchResult } from "@/app/api/members/search/route";
 import { TransactionType } from "@prisma/client";
+import { toLocalDateString } from "@/utils";
 
 // ─── Schema ───────────────────────────────────────────────────
 
-const todayStr = () => new Date().toISOString().split("T")[0] ?? "";
+const todayStr = () => toLocalDateString();
 
 const donationSchema = z.object({
   isMember: z.boolean(),

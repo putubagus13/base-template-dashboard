@@ -1,3 +1,4 @@
+import { toLocalDateString } from "@/utils";
 import { ApiResponseBuilder } from "@/lib/api-response";
 import { requireAuthUser } from "@/lib/auth/helpers";
 import { hasPermission } from "@/lib/auth/rbac";
@@ -131,7 +132,7 @@ export async function GET(request: NextRequest) {
         type: tx.type,
         amount: Number(tx.amount),
         description: tx.description,
-        transactionDate: tx.transactionDate.toISOString(),
+        transactionDate: toLocalDateString(tx.transactionDate),
         verificationStatus: tx.verificationStatus,
         account: { name: tx.account.name },
         donor: tx.donor ? { name: tx.donor.name } : null,

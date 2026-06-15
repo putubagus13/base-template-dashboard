@@ -17,6 +17,7 @@ import {
 } from "@/hooks/use-cash-transactions";
 import { TransactionType } from "@prisma/client";
 import { CashAccount, TransactionCategory } from "@prisma/client";
+import { toLocalDateString } from "@/utils";
 
 const schema = z.object({
   accountId: z.string().min(1, "Akun kas wajib dipilih"),
@@ -55,8 +56,7 @@ const TYPE_OPTIONS = [
 
 function toDateStr(v: string | Date | null | undefined): string {
   if (!v) return "";
-  const d = v instanceof Date ? v : new Date(v);
-  return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0] ?? "";
+  return toLocalDateString(v);
 }
 
 function CreateForm({

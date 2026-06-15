@@ -9,8 +9,9 @@ import { Button, Input, Select, Textarea, FormField } from "@/components/ui";
 import { usePayDuesPayment } from "@/hooks/use-dues";
 import { useCashAccounts } from "@/hooks/use-cash-accounts";
 import type { MemberDuesPaymentProfile } from "@/types";
+import { toLocalDateString } from "@/utils";
 
-const todayStr = () => new Date().toISOString().split("T")[0] ?? "";
+const todayStr = () => toLocalDateString();
 
 const paySchema = z.object({
   accountId: z.string().min(1, "Akun kas wajib dipilih"),

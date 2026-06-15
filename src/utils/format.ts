@@ -10,12 +10,57 @@
  * @example
  * formatDate("2024-01-15") // "15 Jan 2024"
  */
+/** Default timezone for all date formatting (WIB = UTC+7). */
+const DEFAULT_TZ = "Asia/Jakarta";
+
+/**
+ * Get local date string in YYYY-MM-DD format without UTC shift.
+ * Use this for <input type="date"> values and API date params.
+ * Avoids the timezone pitfall of `new Date().toISOString().split("T")[0]`.
+ *
+ * @example
+ * toLocalDateString(new Date("2026-06-11T02:00:00+07:00")) // "2026-06-11"
+ * toLocalDateString() // today's date in local time
+ */
+export function toLocalDateString(date?: string | Date | null): string {
+  if (!date) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * Get local datetime string in YYYY-MM-DDTHH:mm format without UTC shift.
+ * Use this for <input type="datetime-local"> values.
+ */
+export function toLocalDateTimeString(date?: string | Date | null): string {
+  if (!date) return "";
+  const d = date instanceof Date ? date : new Date(date);
+  if (isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const h = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${y}-${m}-${day}T${h}:${min}`;
+}
+
 export function formatDate(date: string | Date | null | undefined): string {
   if (!date) return "—";
   return new Date(date).toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: DEFAULT_TZ,
   });
 }
 
@@ -33,13 +78,16 @@ export function formatDateTime(date: string | Date | null | undefined): string {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: DEFAULT_TZ,
   });
 }
 
 /**
  * Format relative time (e.g. "2 hours ago").
  */
-export function formatRelativeTime(date: string | Date | null | undefined): string {
+export function formatRelativeTime(
+  date: string | Date | null | undefined
+): string {
   if (!date) return "—";
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
   const diff = new Date(date).getTime() - Date.now();

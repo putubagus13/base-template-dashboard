@@ -17,6 +17,7 @@ import {
   MemberProfile,
 } from "@/hooks/use-members";
 import { useGlobalShareStore } from "@/store/global-share.store";
+import { toLocalDateString } from "@/utils";
 
 // ─── Position Options ─────────────────────────────────────────
 
@@ -88,9 +89,7 @@ type MemberFormDialogProps = {
 
 function toDateInputValue(value: Date | string | null | undefined): string {
   if (!value) return "";
-  const d = value instanceof Date ? value : new Date(value);
-  if (isNaN(d.getTime())) return "";
-  return d.toISOString().split("T")[0] ?? "";
+  return toLocalDateString(value);
 }
 
 // ─── Create Form ───────────────────────────────────────────────

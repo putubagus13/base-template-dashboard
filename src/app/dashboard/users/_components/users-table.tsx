@@ -9,6 +9,7 @@ import { PermissionGuard } from "@/components/shared/permission-guard";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { SearchBar } from "@/components/shared/search-bar";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { formatDate } from "@/utils";
 import { Avatar } from "@/components/shared/avatar";
 import { UserFormDialog } from "./user-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -149,13 +150,7 @@ export function UsersTable() {
                   <StatusBadge status={user.status as UserStatus} />
                 </TableCell>
                 <TableCell className="text-sm text-slate-500">
-                  {user.lastLoginAt
-                    ? new Date(user.lastLoginAt).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "Never"}
+                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-1">

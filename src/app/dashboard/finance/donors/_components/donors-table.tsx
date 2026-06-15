@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import { PaginationMeta } from "@/types";
 import { useDeleteDonor, useDonors, DonorWithMember } from "@/hooks/use-donors";
-import { formatDate } from "@/utils";
+import { formatDate, toLocalDateString } from "@/utils";
 import { Badge, Select, StatCard } from "@/components/ui";
 import { DonorsFormDialog } from "./donors-form-dialog";
 import { useRouter } from "next/navigation";
@@ -69,10 +69,8 @@ export function DonorsTable() {
   const [filterMonth, setFilterMonth] = useState(nowDate.getMonth() + 1);
 
   // Compute date range from month
-  const dateFrom =
-    new Date(filterYear, filterMonth - 1, 1).toISOString().split("T")[0] ?? "";
-  const dateTo =
-    new Date(filterYear, filterMonth, 0).toISOString().split("T")[0] ?? "";
+  const dateFrom = toLocalDateString(new Date(filterYear, filterMonth - 1, 1));
+  const dateTo = toLocalDateString(new Date(filterYear, filterMonth, 0));
 
   const { data, isLoading, isError } = useDonors({
     page,

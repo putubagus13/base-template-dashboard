@@ -16,6 +16,7 @@ import {
   TableEmpty,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui";
+import { toLocalDateString } from "@/utils";
 import type { AttendanceLeaderboardEntry } from "@/types";
 
 const RANK_ICONS = [
@@ -35,10 +36,8 @@ export function LeaderboardClient() {
   const [filterYear, setFilterYear] = useState(now.getFullYear());
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1);
 
-  const dateFrom =
-    new Date(filterYear, filterMonth - 1, 1).toISOString().split("T")[0] ?? "";
-  const dateTo =
-    new Date(filterYear, filterMonth, 0).toISOString().split("T")[0] ?? "";
+  const dateFrom = toLocalDateString(new Date(filterYear, filterMonth - 1, 1));
+  const dateTo = toLocalDateString(new Date(filterYear, filterMonth, 0));
 
   const { data, isLoading, isError } = useAttendanceLeaderboard({
     dateFrom,

@@ -13,6 +13,7 @@ import {
 } from "@/hooks/use-meetings";
 import type { MeetingProfile } from "@/types";
 import { MeetingStatus } from "@prisma/client";
+import { toLocalDateTimeString } from "@/utils";
 
 type MeetingFormDialogProps = {
   open: boolean;
@@ -65,7 +66,7 @@ export function MeetingFormDialog({
         title: meeting.title,
         meetingTypeId: meeting.meetingTypeId,
         scheduledAt: meeting.scheduledAt
-          ? new Date(meeting.scheduledAt).toISOString().slice(0, 16)
+          ? toLocalDateTimeString(meeting.scheduledAt)
           : "",
         status: meeting.status,
         description: meeting.description ?? "",

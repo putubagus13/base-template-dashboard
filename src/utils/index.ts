@@ -1,6 +1,8 @@
 // src/utils/index.ts
 export { cn } from "./cn";
 export {
+  toLocalDateString,
+  toLocalDateTimeString,
   formatDate,
   formatDateTime,
   formatRelativeTime,

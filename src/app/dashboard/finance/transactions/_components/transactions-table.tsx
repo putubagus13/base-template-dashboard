@@ -37,7 +37,7 @@ import {
 import { CashTransactionWithRelations } from "@/hooks/use-cash-transactions";
 import { useCashAccounts } from "@/hooks/use-cash-accounts";
 import { useTransactionCategories } from "@/hooks/use-transaction-categories";
-import { formatDate } from "@/utils";
+import { formatDate, toLocalDateString } from "@/utils";
 import { Select, StatCard } from "@/components/ui";
 import { TransactionStatus, TransactionType } from "@prisma/client";
 import { TransactionFormDialog } from "./transactions-form-dialog";
@@ -91,10 +91,8 @@ export function TransactionsTable() {
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1);
 
   // Compute date range from month
-  const dateFrom =
-    new Date(filterYear, filterMonth - 1, 1).toISOString().split("T")[0] ?? "";
-  const dateTo =
-    new Date(filterYear, filterMonth, 0).toISOString().split("T")[0] ?? "";
+  const dateFrom = toLocalDateString(new Date(filterYear, filterMonth - 1, 1));
+  const dateTo = toLocalDateString(new Date(filterYear, filterMonth, 0));
 
   // Load accounts and categories for filters
   const { data: accountsData } = useCashAccounts({ limit: 100 });

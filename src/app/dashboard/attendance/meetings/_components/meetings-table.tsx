@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/table";
 import { PaginationMeta } from "@/types";
 import { useMeetings, useDeleteMeeting } from "@/hooks/use-meetings";
-import { formatDate } from "@/utils";
+import { formatDate, toLocalDateString } from "@/utils";
 import { Badge, StatCard, Select } from "@/components/ui";
 import { MeetingFormDialog } from "./meeting-form-dialog";
 import { ROUTES } from "@/config/routes";
@@ -69,10 +69,8 @@ export function MeetingsTable() {
   const [filterYear, setFilterYear] = useState(nowDate.getFullYear());
   const [filterMonth, setFilterMonth] = useState(nowDate.getMonth() + 1);
 
-  const dateFrom =
-    new Date(filterYear, filterMonth - 1, 1).toISOString().split("T")[0] ?? "";
-  const dateTo =
-    new Date(filterYear, filterMonth, 0).toISOString().split("T")[0] ?? "";
+  const dateFrom = toLocalDateString(new Date(filterYear, filterMonth - 1, 1));
+  const dateTo = toLocalDateString(new Date(filterYear, filterMonth, 0));
 
   const { data, isLoading, isError } = useMeetings({
     page,
