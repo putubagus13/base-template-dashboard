@@ -40,7 +40,7 @@ const GENDER_OPTIONS = [
 
 const createSchema = z.object({
   fullName: z.string().min(2, "Nama lengkap minimal 2 karakter"),
-  memberNumber: z.string().min(1, "Nomor anggota wajib diisi"),
+  // memberNumber: z.string().min(1, "Nomor anggota wajib diisi"),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
     required_error: "Jenis kelamin wajib dipilih",
   }),
@@ -147,7 +147,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
           />
         </FormField>
 
-        <FormField
+        {/* <FormField
           label="Nomor Anggota"
           htmlFor="memberNumber"
           error={errors.memberNumber?.message}
@@ -159,7 +159,7 @@ function CreateMemberForm({ onClose }: { onClose: () => void }) {
             error={errors.memberNumber?.message}
             {...register("memberNumber")}
           />
-        </FormField>
+        </FormField> */}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -324,7 +324,7 @@ function EditMemberForm({
     resolver: zodResolver(editSchema),
     defaultValues: {
       fullName: member.fullName,
-      memberNumber: member.memberNumber,
+      // memberNumber: member.memberNumber,
       gender: member.gender,
       dateOfBirth: toDateInputValue(member.dateOfBirth),
       address: member.address ?? "",
@@ -371,7 +371,7 @@ function EditMemberForm({
             {...register("fullName")}
           />
         </FormField>
-
+        {/* 
         <FormField
           label="Nomor Anggota"
           htmlFor="edit-memberNumber"
@@ -384,7 +384,7 @@ function EditMemberForm({
             error={errors.memberNumber?.message}
             {...register("memberNumber")}
           />
-        </FormField>
+        </FormField> */}
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
