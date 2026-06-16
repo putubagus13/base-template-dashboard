@@ -55,7 +55,7 @@ export type MemberProfile = {
 
 export type CreateMemberPayload = {
   fullName: string;
-  memberNumber: string;
+  // memberNumber: string;
   gender: GenderType;
   dateOfBirth?: string | null;
   address?: string | null;

@@ -149,7 +149,7 @@ export function UsersTable() {
             }}
           />
         </div>
-        <PermissionGuard permission="create:user">
+        <PermissionGuard permission="create:member">
           <Button size="sm" onClick={openCreate}>
             <Plus className="h-4 w-4" />
             Tambah Pengguna
@@ -230,17 +230,17 @@ export function UsersTable() {
 
                 <TableCell>
                   <div className="flex items-center justify-end gap-1">
-                    {can("update:user") && (
+                    {can("update:member") && (
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => openEdit(member)}
-                        aria-label="Edit user"
+                        aria-label="Edit member"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
                     )}
-                    {can("delete:user") && (
+                    {can("delete:member") && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -251,7 +251,7 @@ export function UsersTable() {
                             name: member.fullName,
                           })
                         }
-                        aria-label="Delete user"
+                        aria-label="Delete member"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -277,11 +277,11 @@ export function UsersTable() {
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirm}
-        title="Hapus Pengguna"
+        title="Hapus Anggota"
         description={`Apakah Anda yakin ingin menghapus anggota "${
           deleteTarget?.name ?? ""
         }"?`}
-        confirmLabel="Hapus Pengguna"
+        confirmLabel="Hapus Anggota"
         isLoading={deleteMember.isPending}
       />
     </>
