@@ -32,7 +32,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <FormField
-        label="Email address"
+        label="Alamat email"
         htmlFor="email"
         error={errors.email?.message}
         required
@@ -68,7 +68,9 @@ export function LoginForm() {
             onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             tabIndex={-1}
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={
+              showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
+            }
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" />
@@ -86,18 +88,18 @@ export function LoginForm() {
             className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             {...register("rememberMe")}
           />
-          Remember me
+          Ingat saya
         </label>
         <Link
           href="/auth/forgot-password"
           className="text-sm text-brand-600 hover:text-brand-500 hover:underline"
         >
-          Forgot password?
+          Lupa kata sandi?
         </Link>
       </div>
 
       <Button type="submit" className="w-full" isLoading={login.isPending}>
-        Sign in
+        Masuk
       </Button>
 
       {/* <p className="text-center text-sm text-slate-600">

@@ -31,7 +31,7 @@ export function useLogin() {
       if (response.data) {
         setUser(response.data.user);
         queryClient.clear();
-        toast.success("Welcome back!");
+        toast.success("Selamat datang kembali!");
         router.push("/dashboard");
         router.refresh();
       }
@@ -40,7 +40,7 @@ export function useLogin() {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error("Terjadi kesalahan. Silakan coba lagi.");
       }
     },
   });
@@ -55,14 +55,14 @@ export function useRegister() {
     mutationFn: (data: RegisterCredentials) =>
       apiClient.post(ROUTES.api.auth.register, data),
     onSuccess: () => {
-      toast.success("Registration successful! Please verify your email.");
+      toast.success("Registrasi berhasil! Silakan verifikasi email Anda.");
       router.push("/auth/login?registered=true");
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Registration failed. Please try again.");
+        toast.error("Registrasi gagal. Silakan coba lagi.");
       }
     },
   });
@@ -99,13 +99,15 @@ export function useForgotPassword() {
     mutationFn: (data: ForgotPasswordRequest) =>
       apiClient.post(ROUTES.api.auth.forgotPassword, data),
     onSuccess: () => {
-      toast.success("Password reset email sent. Please check your inbox.");
+      toast.success(
+        "Email reset kata sandi telah dikirim. Silakan periksa kotak masuk Anda."
+      );
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to send reset email. Please try again.");
+        toast.error("Gagal mengirim email reset. Silakan coba lagi.");
       }
     },
   });
@@ -120,14 +122,14 @@ export function useResetPassword() {
     mutationFn: (data: ResetPasswordRequest) =>
       apiClient.post(ROUTES.api.auth.resetPassword, data),
     onSuccess: () => {
-      toast.success("Password reset successful! Please log in.");
+      toast.success("Kata sandi berhasil diatur ulang! Silakan masuk.");
       router.push(`/auth/login?reset=true`);
     },
     onError: (error: unknown) => {
       if (error instanceof ApiError) {
         toast.error(error.message);
       } else {
-        toast.error("Failed to reset password. Please try again.");
+        toast.error("Gagal mengatur ulang kata sandi. Silakan coba lagi.");
       }
     },
   });

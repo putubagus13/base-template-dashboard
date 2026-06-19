@@ -41,10 +41,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <input type="hidden" {...register("token")} />
 
       <FormField
-        label="New password"
+        label="Kata sandi baru"
         htmlFor="password"
         error={errors.password?.message}
-        hint="Min. 8 characters with uppercase, lowercase, number & special character"
+        hint="Min. 8 karakter dengan huruf besar, huruf kecil, angka & karakter khusus"
         required
       >
         <div className="relative">
@@ -73,7 +73,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       </FormField>
 
       <FormField
-        label="Confirm new password"
+        label="Konfirmasi kata sandi baru"
         htmlFor="confirmPassword"
         error={errors.confirmPassword?.message}
         required
@@ -108,7 +108,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         className="w-full"
         isLoading={resetPassword.isPending}
       >
-        Reset password
+        Atur ulang kata sandi
       </Button>
     </form>
   );

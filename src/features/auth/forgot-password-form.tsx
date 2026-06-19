@@ -48,17 +48,17 @@ export function ForgotPasswordForm() {
           </svg>
         </div>
         <h3 className="text-sm font-semibold text-emerald-900">
-          Check your email
+          Periksa email Anda
         </h3>
         <p className="mt-1 text-sm text-emerald-700">
-          If an account exists, we&apos;ve sent a password reset link to your
-          inbox.
+          Jika akun terdaftar, kami telah mengirimkan tautan reset kata sandi ke
+          kotak masuk Anda.
         </p>
         <Link
           href="/auth/login"
           className="mt-4 inline-block text-sm text-brand-600 hover:underline"
         >
-          Back to sign in
+          Kembali ke masuk
         </Link>
       </div>
     );
@@ -67,7 +67,7 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       <FormField
-        label="Email address"
+        label="Alamat email"
         htmlFor="email"
         error={errors.email?.message}
         required
@@ -87,7 +87,7 @@ export function ForgotPasswordForm() {
         className="w-full"
         isLoading={forgotPassword.isPending}
       >
-        Send reset link
+        Kirim tautan reset
       </Button>
 
       <Link
@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
         className="flex items-center justify-center gap-1.5 text-sm text-slate-600 hover:text-slate-900"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to sign in
+        Kembali ke masuk
       </Link>
     </form>
   );

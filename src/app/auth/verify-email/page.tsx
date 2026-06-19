@@ -15,12 +15,12 @@ export default function VerifyEmailPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
-  const [message, setMessage] = useState("Verifying your email...");
+  const [message, setMessage] = useState("Memverifikasi email Anda...");
 
   useEffect(() => {
     if (!token) {
       setStatus("error");
-      setMessage("No verification token provided.");
+      setMessage("Token verifikasi tidak ditemukan.");
       return;
     }
 
@@ -31,14 +31,14 @@ export default function VerifyEmailPage() {
         );
         if (res.success) {
           setStatus("success");
-          setMessage(res.message ?? "Email verified successfully!");
+          setMessage(res.message ?? "Email berhasil diverifikasi!");
         } else {
           setStatus("error");
-          setMessage(res.message ?? "Verification failed.");
+          setMessage(res.message ?? "Verifikasi gagal.");
         }
       } catch {
         setStatus("error");
-        setMessage("An error occurred during verification. Please try again.");
+        setMessage("Terjadi kesalahan saat verifikasi. Silakan coba lagi.");
       }
     })();
   }, [token]);
@@ -49,7 +49,7 @@ export default function VerifyEmailPage() {
         <>
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-brand-600" />
           <h2 className="mt-4 text-lg font-semibold text-slate-800">
-            Verifying...
+            Memverifikasi...
           </h2>
           <p className="mt-2 text-sm text-slate-500">{message}</p>
         </>
@@ -59,14 +59,14 @@ export default function VerifyEmailPage() {
         <>
           <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
           <h2 className="mt-4 text-lg font-semibold text-emerald-800">
-            Email Verified!
+            Email Terverifikasi!
           </h2>
           <p className="mt-2 text-sm text-slate-600">{message}</p>
           <Link
             href="/auth/login"
             className="mt-6 inline-block rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
           >
-            Continue to Sign in
+            Lanjut ke Masuk
           </Link>
         </>
       )}
@@ -75,14 +75,14 @@ export default function VerifyEmailPage() {
         <>
           <XCircle className="mx-auto h-12 w-12 text-red-400" />
           <h2 className="mt-4 text-lg font-semibold text-red-800">
-            Verification Failed
+            Verifikasi Gagal
           </h2>
           <p className="mt-2 text-sm text-red-600">{message}</p>
           <Link
             href="/auth/login"
             className="mt-6 inline-block text-sm font-medium text-brand-600 hover:underline"
           >
-            Back to Sign in
+            Kembali ke Masuk
           </Link>
         </>
       )}

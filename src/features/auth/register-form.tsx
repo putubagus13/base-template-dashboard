@@ -36,7 +36,7 @@ export function RegisterForm() {
   useEffect(() => {
     if (!token) {
       setInviteError(
-        "No invitation token provided. Registration requires a valid invitation link."
+        "Token undangan tidak ditemukan. Registrasi memerlukan tautan undangan yang valid."
       );
       setInviteLoading(false);
       return;
@@ -52,11 +52,11 @@ export function RegisterForm() {
         if (res.data) {
           setInviteInfo(res.data);
         } else {
-          setInviteError(res.message ?? "Invalid invitation.");
+          setInviteError(res.message ?? "Undangan tidak valid.");
         }
       } catch {
         setInviteError(
-          "Failed to validate invitation. The link may be invalid or expired."
+          "Gagal memvalidasi undangan. Tautan mungkin tidak valid atau sudah kedaluwarsa."
         );
       } finally {
         setInviteLoading(false);
@@ -92,7 +92,7 @@ export function RegisterForm() {
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
         <span className="ml-2 text-sm text-slate-500">
-          Validating invitation...
+          Memvalidasi undangan...
         </span>
       </div>
     );
@@ -104,18 +104,18 @@ export function RegisterForm() {
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
         <AlertCircle className="mx-auto h-10 w-10 text-red-400" />
         <h2 className="mt-3 text-lg font-semibold text-red-800">
-          Invalid Invitation
+          Undangan Tidak Valid
         </h2>
         <p className="mt-1 text-sm text-red-600">{inviteError}</p>
         <p className="mt-4 text-sm text-slate-500">
-          Registration is only available via invitation link. Please contact
-          your administrator.
+          Registrasi hanya tersedia melalui tautan undangan. Silakan hubungi
+          administrator Anda.
         </p>
         <Link
           href="/auth/login"
           className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline"
         >
-          Back to Sign in
+          Kembali ke Masuk
         </Link>
       </div>
     );
@@ -127,7 +127,7 @@ export function RegisterForm() {
       <input type="hidden" {...register("token")} />
 
       <FormField
-        label="Full name"
+        label="Nama lengkap"
         htmlFor="name"
         error={errors.name?.message}
         required
@@ -136,14 +136,14 @@ export function RegisterForm() {
           id="name"
           type="text"
           autoComplete="name"
-          placeholder="John Doe"
+          placeholder="Nama Anda"
           error={errors.name?.message}
           {...register("name")}
         />
       </FormField>
 
       <FormField
-        label="Email address"
+        label="Alamat email"
         htmlFor="email"
         error={errors.email?.message}
         required
@@ -160,16 +160,16 @@ export function RegisterForm() {
         />
         {inviteInfo?.email && (
           <p className="mt-1 text-xs text-slate-400">
-            Email is pre-filled from your invitation.
+            Email telah diisi otomatis dari undangan Anda.
           </p>
         )}
       </FormField>
 
       <FormField
-        label="Password"
+        label="Kata sandi"
         htmlFor="password"
         error={errors.password?.message}
-        hint="Min. 8 characters with uppercase, lowercase, number & special character"
+        hint="Min. 8 karakter dengan huruf besar, huruf kecil, angka & karakter khusus"
         required
       >
         <div className="relative">
@@ -198,7 +198,7 @@ export function RegisterForm() {
       </FormField>
 
       <FormField
-        label="Confirm password"
+        label="Konfirmasi kata sandi"
         htmlFor="confirmPassword"
         error={errors.confirmPassword?.message}
         required
@@ -229,16 +229,16 @@ export function RegisterForm() {
       </FormField>
 
       <Button type="submit" className="w-full" isLoading={register_.isPending}>
-        Create account
+        Buat akun
       </Button>
 
       <p className="text-center text-sm text-slate-600">
-        Already have an account?{" "}
+        Sudah punya akun?{" "}
         <Link
           href="/auth/login"
           className="font-medium text-brand-600 hover:underline"
         >
-          Sign in
+          Masuk
         </Link>
       </p>
     </form>

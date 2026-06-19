@@ -8,22 +8,22 @@ import { z } from "zod";
 
 const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters")
-  .max(100, "Password must be at most 100 characters")
-  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-  .regex(/[0-9]/, "Password must contain at least one number")
+  .min(8, "Kata sandi minimal 8 karakter")
+  .max(100, "Kata sandi maksimal 100 karakter")
+  .regex(/[A-Z]/, "Kata sandi harus mengandung minimal satu huruf besar")
+  .regex(/[a-z]/, "Kata sandi harus mengandung minimal satu huruf kecil")
+  .regex(/[0-9]/, "Kata sandi harus mengandung minimal satu angka")
   .regex(
     /[^A-Za-z0-9]/,
-    "Password must contain at least one special character"
+    "Kata sandi harus mengandung minimal satu karakter khusus"
   );
 
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+    .min(1, "Email wajib diisi")
+    .email("Masukkan alamat email yang valid"),
+  password: z.string().min(1, "Kata sandi wajib diisi"),
   rememberMe: z.boolean().optional().default(false),
 });
 
@@ -31,37 +31,37 @@ export const registerSchema = z
   .object({
     name: z
       .string()
-      .min(2, "Name must be at least 2 characters")
-      .max(100, "Name must be at most 100 characters")
-      .regex(/^[a-zA-Z\s]+$/, "Name must only contain letters and spaces"),
+      .min(2, "Nama minimal 2 karakter")
+      .max(100, "Nama maksimal 100 karakter")
+      .regex(/^[a-zA-Z\s]+$/, "Nama hanya boleh mengandung huruf dan spasi"),
     email: z
       .string()
-      .min(1, "Email is required")
-      .email("Please enter a valid email address"),
+      .min(1, "Email wajib diisi")
+      .email("Masukkan alamat email yang valid"),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-    token: z.string().min(1, "Invitation token is required"),
+    confirmPassword: z.string().min(1, "Konfirmasi kata sandi wajib diisi"),
+    token: z.string().min(1, "Token undangan wajib diisi"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Kata sandi tidak cocok",
     path: ["confirmPassword"],
   });
 
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
+    .min(1, "Email wajib diisi")
+    .email("Masukkan alamat email yang valid"),
 });
 
 export const resetPasswordSchema = z
   .object({
-    token: z.string().min(1, "Reset token is required"),
+    token: z.string().min(1, "Token reset wajib diisi"),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, "Please confirm your password"),
+    confirmPassword: z.string().min(1, "Konfirmasi kata sandi wajib diisi"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Kata sandi tidak cocok",
     path: ["confirmPassword"],
   });
 

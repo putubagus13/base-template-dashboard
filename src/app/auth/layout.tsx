@@ -4,7 +4,7 @@ import { STT_TGD_LOGO } from "../../../public";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: { template: "%s | Auth", default: "Auth" },
+  title: { template: "%s | Autentikasi", default: "Autentikasi" },
 };
 
 export default function AuthLayout({

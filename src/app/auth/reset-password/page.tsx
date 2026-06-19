@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetPasswordForm } from "@/features/auth/reset-password-form";
 
-export const metadata: Metadata = { title: "Reset password" };
+export const metadata: Metadata = { title: "Atur ulang kata sandi" };
 
 type ResetPasswordPageProps = {
   searchParams: Promise<{
@@ -34,15 +34,17 @@ export default async function ResetPasswordPage({
             />
           </svg>
         </div>
-        <h1 className="text-xl font-bold text-slate-900">Invalid reset link</h1>
+        <h1 className="text-xl font-bold text-slate-900">
+          Tautan reset tidak valid
+        </h1>
         <p className="mt-2 text-sm text-slate-500">
-          This password reset link is invalid or has expired.
+          Tautan reset kata sandi ini tidak valid atau sudah kedaluwarsa.
         </p>
         <Link
           href="/auth/forgot-password"
           className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline"
         >
-          Request a new link
+          Minta tautan baru
         </Link>
       </div>
     );
@@ -51,9 +53,11 @@ export default async function ResetPasswordPage({
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Set new password</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          Atur kata sandi baru
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Choose a strong password for your account.
+          Pilih kata sandi yang kuat untuk akun Anda.
         </p>
       </div>
       <ResetPasswordForm token={token} />
