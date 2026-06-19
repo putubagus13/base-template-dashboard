@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   Trophy,
   Heart,
+  Download,
 } from "lucide-react";
 import { MonthPicker } from "@/components/shared/month-picker";
 import {
@@ -23,6 +24,10 @@ import {
 import { Badge } from "@/components/ui";
 import { useFinanceSummary } from "@/hooks/use-finance-summary";
 import { formatDate } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { ROUTES } from "@/config/routes";
+import { exportFileFromApi } from "@/lib/export-file";
+import toast from "react-hot-toast";
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
@@ -57,10 +62,34 @@ export function FinanceSummaryClient() {
 
   const { data, isLoading } = useFinanceSummary(year, month);
   const summary = data?.data;
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleMonthChange = (y: number, m: number) => {
     setYear(y);
     setMonth(m);
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      // // Build date range from selected month
+      // const dateFrom = `${year}-${String(month).padStart(2, "0")}-01`;
+      // const lastDay = new Date(year, month, 0).getDate();
+      // const dateTo = `${year}-${String(month).padStart(2, "0")}-${String(
+      //   lastDay
+      // ).padStart(2, "0")}`;
+
+      await exportFileFromApi(
+        ROUTES.api.financeExport,
+        {},
+        "ringkasan-keuangan.xlsx"
+      );
+      toast.success("Data keuangan berhasil diekspor.");
+    } catch {
+      toast.error("Gagal mengekspor data keuangan.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -68,7 +97,18 @@ export function FinanceSummaryClient() {
       {/* Month Filter */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500">Periode:</p>
-        <MonthPicker year={year} month={month} onChange={handleMonthChange} />
+        <div className="flex items-center gap-3">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleExport}
+            isLoading={isExporting}
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <MonthPicker year={year} month={month} onChange={handleMonthChange} />
+        </div>
       </div>
 
       {/* Section 1: Overview Stats */}
