@@ -9,6 +9,7 @@ import {
   Users,
   UserCheck,
   UserMinus,
+  Download,
 } from "lucide-react";
 import { usePermissions } from "@/hooks/use-permission";
 import { PermissionGuard } from "@/components/shared/permission-guard";
@@ -36,6 +37,9 @@ import { useGlobalShareStore } from "@/store/global-share.store";
 import { MemberProfile } from "@/hooks/use-members";
 import { Member } from "@prisma/client";
 import { MemberFormDialog } from "./members-form-dialog";
+import { ROUTES } from "@/config/routes";
+import { exportFileFromApi } from "@/lib/export-file";
+import toast from "react-hot-toast";
 
 export function UsersTable() {
   const [page, setPage] = useState(1);
@@ -57,6 +61,27 @@ export function UsersTable() {
   } | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [selectedPosition, setSelectedPosition] = useState<string>("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportFileFromApi(
+        ROUTES.api.memberExport,
+        {
+          ...(search && { search }),
+          ...(selectedPosition && { statusId: selectedPosition }),
+          ...(selectedStatus && { isActive: selectedStatus }),
+        },
+        "daftar-anggota.xlsx"
+      );
+      toast.success("Data anggota berhasil diekspor.");
+    } catch {
+      toast.error("Gagal mengekspor data anggota.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const { data, isLoading, isError } = useMembers({
     page,
@@ -149,12 +174,23 @@ export function UsersTable() {
             }}
           />
         </div>
-        <PermissionGuard permission="create:member">
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            Tambah Pengguna
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleExport}
+            isLoading={isExporting}
+          >
+            <Download className="h-4 w-4" />
+            Export
           </Button>
-        </PermissionGuard>
+          <PermissionGuard permission="create:member">
+            <Button size="sm" onClick={openCreate}>
+              <Plus className="h-4 w-4" />
+              Tambah Pengguna
+            </Button>
+          </PermissionGuard>
+        </div>
       </div>
 
       <TableRoot

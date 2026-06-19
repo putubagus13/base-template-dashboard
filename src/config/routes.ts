@@ -73,7 +73,9 @@ export const ROUTES = {
     donor: (id: string) => `/api/donors/${id}`,
     donorLeaderboard: "/api/donors/leaderboard",
     financeSummary: "/api/finance/summary",
+    financeExport: "/api/finance/export",
     memberSearch: "/api/members/search",
+    memberExport: "/api/members/export",
     // Meeting
     meetingTypes: "/api/meeting-types",
     meetingType: (id: string) => `/api/meeting-types/${id}`,
