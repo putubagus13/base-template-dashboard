@@ -28,6 +28,9 @@ export const ROUTES = {
     donors: "/dashboard/finance/donors",
     donations: "/dashboard/finance/donations",
     financeSummary: "/dashboard/finance/summary",
+    // Loans (Pinjaman)
+    loans: "/dashboard/finance/loans",
+    loanDetail: (id: string) => `/dashboard/finance/loans/${id}`,
     // Dues (Iuran Anggota)
     duesAgendas: "/dashboard/finance/dues",
     duesAgendaDetail: (id: string) => `/dashboard/finance/dues/${id}`,
@@ -95,6 +98,15 @@ export const ROUTES = {
       `/api/dues-agendas/${agendaId}/payments`,
     memberDuesPayment: (id: string) => `/api/member-dues-payments/${id}`,
     memberDuesPaymentPay: (id: string) => `/api/member-dues-payments/${id}/pay`,
+    // Loans (Pinjaman)
+    borrowers: "/api/borrowers",
+    borrowerSearch: "/api/borrowers/search",
+    loans: "/api/loans",
+    loan: (id: string) => `/api/loans/${id}`,
+    loanVerify: (id: string) => `/api/loans/${id}/verify`,
+    loanPayments: (loanId: string) => `/api/loans/${loanId}/payments`,
+    loanPayment: (id: string) => `/api/loan-payments/${id}`,
+    loanPaymentVerify: (id: string) => `/api/loan-payments/${id}/verify`,
   },
 } as const;
 

@@ -63,3 +63,20 @@ export type {
   UpdateDuesAgendaPayload,
   PayDuesPaymentPayload,
 } from "./dues";
+export type {
+  ListLoanQueryParam,
+  ListLoanPaymentQueryParam,
+  ListBorrowerQueryParam,
+  BorrowerProfile,
+  LoanProfile,
+  LoanDetailProfile,
+  LoanPaymentProfile,
+  LoanSummary,
+  CreateLoanPayload,
+  UpdateLoanPayload,
+  VerifyLoanPayload,
+  CreateLoanPaymentPayload,
+  UpdateLoanPaymentPayload,
+  CreateBorrowerPayload,
+  BorrowerSearchResult,
+} from "./loan";

@@ -86,6 +86,13 @@ enum DuesPaymentStatus {
   PAID
 }
 
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID_OFF
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -110,6 +117,10 @@ model User {
   organizations     UserOrganization[]
   recordedTransactions CashTransaction[] @relation("CashTransactionRecorder")
   verifiedTransactions CashTransaction[] @relation("CashTransactionVerifier")
+  recordedLoans         Loan[]           @relation("LoanRecorder")
+  verifiedLoans         Loan[]           @relation("LoanVerifier")
+  recordedLoanPayments  LoanPayment[]    @relation("LoanPaymentRecorder")
+  verifiedLoanPayments  LoanPayment[]    @relation("LoanPaymentVerifier")
 
   @@index([email])
   @@map("users")
@@ -261,6 +272,9 @@ model Organization {
   meetings             Meeting[]
   attendancePointConfigs AttendancePointConfig[]
   duesAgendas          DuesAgenda[]
+  borrowers            Borrower[]
+  loans                Loan[]
+  loanPayments         LoanPayment[]
 
   @@index([name])
   @@map("organization")
@@ -302,6 +316,7 @@ model CashAccount {
   // Relations
   organization  Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   transactions  CashTransaction[]
+  loans         Loan[]
 
   @@index([organizationId])
   @@index([name])
@@ -363,6 +378,8 @@ model CashTransaction {
   verifier            User?                 @relation("CashTransactionVerifier", fields: [verifiedBy], references: [id])
   donor               Donor?                @relation(fields: [donorId], references: [id], onDelete: SetNull)
   duesPayment         MemberDuesPayment?
+  loan                Loan?                 @relation("LoanDisbursement")
+  loanPayment         LoanPayment?          @relation("LoanPaymentTransaction")
 
   @@index([accountId])
   @@index([organizationId])
@@ -423,6 +440,7 @@ model Member {
   donorRecords    Donor[]
   attendances     Attendance[]
   duesPayments    MemberDuesPayment[]
+  borrowerRecords Borrower[]
 
   @@index([organizationId])
   @@index([statusId])
@@ -626,4 +644,111 @@ model MemberDuesPayment {
   @@index([memberId])
   @@index([status])
   @@map("member_dues_payments")
+}
+
+// ─── LOANS (CATATAN PINJAMAN) ─────────────────────────────────
+
+model Borrower {
+  id              String   @id @default(uuid())
+  organizationId  String
+  memberId        String?
+  name            String
+  phone           String?
+  address         String?
+  isMember        Boolean  @default(false)
+  totalBorrowed   Decimal  @default(0) @db.Decimal(15, 2)
+  totalPaid       Decimal  @default(0) @db.Decimal(15, 2)
+  notes           String?
+  createdAt       DateTime @default(now())
+  createdBy       String?
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  member          Member?      @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  loans           Loan[]
+
+  @@index([organizationId])
+  @@index([name])
+  @@index([memberId])
+  @@index([organizationId, name])
+  @@map("borrowers")
+}
+
+model Loan {
+  id                String     @id @default(uuid())
+  organizationId    String
+  borrowerId        String
+  accountId         String
+  loanNumber        String     @unique
+  principal         Decimal    @db.Decimal(15, 2)
+  interestRate      Decimal    @db.Decimal(5, 4)
+  durationMonths    Int
+  totalInterest     Decimal    @db.Decimal(15, 2)
+  totalOwed         Decimal    @db.Decimal(15, 2)
+  paidAmount        Decimal    @default(0) @db.Decimal(15, 2)
+  remainingAmount   Decimal    @db.Decimal(15, 2)
+  loanDate          DateTime   @db.Date
+  dueDate           DateTime   @db.Date
+  status            LoanStatus @default(PENDING)
+  purpose           String?
+  notes             String?
+  cashTransactionId String?    @unique
+  recordedBy        String
+  verifiedBy        String?
+  verifiedAt        DateTime?
+  createdAt         DateTime   @default(now())
+  createdBy         String?
+  updatedAt         DateTime   @updatedAt
+  updatedBy         String?
+  deletedAt         DateTime?
+
+  // Relations
+  organization      Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  borrower          Borrower       @relation(fields: [borrowerId], references: [id], onDelete: Cascade)
+  account           CashAccount    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  recorder          User           @relation("LoanRecorder", fields: [recordedBy], references: [id])
+  verifier          User?          @relation("LoanVerifier", fields: [verifiedBy], references: [id])
+  cashTransaction   CashTransaction? @relation("LoanDisbursement", fields: [cashTransactionId], references: [id], onDelete: SetNull)
+  payments          LoanPayment[]
+
+  @@index([organizationId])
+  @@index([borrowerId])
+  @@index([accountId])
+  @@index([status])
+  @@index([loanDate])
+  @@map("loans")
+}
+
+model LoanPayment {
+  id                String     @id @default(uuid())
+  organizationId    String
+  loanId            String
+  amount            Decimal    @db.Decimal(15, 2)
+  paymentDate       DateTime   @db.Date
+  notes             String?
+  status            LoanStatus @default(PENDING)
+  cashTransactionId String?    @unique
+  recordedBy        String
+  verifiedBy        String?
+  verifiedAt        DateTime?
+  createdAt         DateTime   @default(now())
+  createdBy         String?
+  updatedAt         DateTime   @updatedAt
+  updatedBy         String?
+  deletedAt         DateTime?
+
+  // Relations
+  organization      Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  loan              Loan           @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  recorder          User           @relation("LoanPaymentRecorder", fields: [recordedBy], references: [id])
+  verifier          User?          @relation("LoanPaymentVerifier", fields: [verifiedBy], references: [id])
+  cashTransaction   CashTransaction? @relation("LoanPaymentTransaction", fields: [cashTransactionId], references: [id], onDelete: SetNull)
+
+  @@index([loanId])
+  @@index([organizationId])
+  @@index([status])
+  @@map("loan_payments")
 }

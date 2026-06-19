@@ -198,6 +198,38 @@ async function main(): Promise<void> {
       subject: "memberDuesPayment",
       description: "Update member dues payment",
     },
+    // Loan (Pinjaman)
+    { action: "create", subject: "loan", description: "Create new loans" },
+    { action: "read", subject: "loan", description: "View loan data" },
+    { action: "update", subject: "loan", description: "Update loan data" },
+    { action: "delete", subject: "loan", description: "Delete loans" },
+    { action: "verify", subject: "loan", description: "Verify loan data" },
+    // Loan Payment
+    {
+      action: "create",
+      subject: "loanPayment",
+      description: "Create loan payments",
+    },
+    {
+      action: "read",
+      subject: "loanPayment",
+      description: "View loan payment data",
+    },
+    {
+      action: "update",
+      subject: "loanPayment",
+      description: "Update loan payment data",
+    },
+    {
+      action: "delete",
+      subject: "loanPayment",
+      description: "Delete loan payments",
+    },
+    {
+      action: "verify",
+      subject: "loanPayment",
+      description: "Verify loan payment data",
+    },
   ];
 
   const createdPermissions = await Promise.all(

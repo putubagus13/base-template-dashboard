@@ -121,3 +121,23 @@ export {
   usePayDuesPayment,
   duesKeys,
 } from "./use-dues";
+export {
+  useLoans,
+  useLoan,
+  useCreateLoan,
+  useUpdateLoan,
+  useDeleteLoan,
+  useVerifyLoan,
+  useLoanPayments,
+  useCreateLoanPayment,
+  useUpdateLoanPayment,
+  useDeleteLoanPayment,
+  useVerifyLoanPayment,
+  loanKeys,
+} from "./use-loans";
+export {
+  useBorrowers,
+  useBorrowerSearch,
+  useCreateBorrower,
+  borrowerKeys,
+} from "./use-borrowers";

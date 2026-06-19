@@ -26,6 +26,7 @@ import {
   Settings2,
   Trophy,
   ReceiptText,
+  CircleDollarSign,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { usePermissions } from "@/hooks/use-permission";
@@ -100,6 +101,12 @@ const NAV_ITEMS: NavItem[] = [
         href: "/dashboard/finance/dues",
         icon: ReceiptText,
         permission: "read:duesAgenda",
+      },
+      {
+        label: "Pinjaman",
+        href: "/dashboard/finance/loans",
+        icon: CircleDollarSign,
+        permission: "read:loan",
       },
     ],
   },
