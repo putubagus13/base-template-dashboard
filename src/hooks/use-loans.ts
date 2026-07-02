@@ -43,6 +43,7 @@ export function useLoans(params: ListLoanQueryParam = {}) {
   if (params.accountId) searchParams.set("accountId", params.accountId);
   if (params.dateFrom) searchParams.set("dateFrom", params.dateFrom);
   if (params.dateTo) searchParams.set("dateTo", params.dateTo);
+  if (params.overdue) searchParams.set("overdue", "true");
 
   return useQuery({
     queryKey: loanKeys.list(params),

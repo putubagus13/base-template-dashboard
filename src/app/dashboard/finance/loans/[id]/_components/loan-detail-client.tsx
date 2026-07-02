@@ -2,7 +2,13 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2, XCircle, Plus } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  Plus,
+  AlertCircle,
+} from "lucide-react";
 import {
   useLoan,
   useVerifyLoan,
@@ -69,6 +75,15 @@ function formatCurrency(value: string | number): string {
   }).format(num);
 }
 
+function computePaymentMonth(paymentDate: string, loanDate: string): number {
+  const pd = new Date(paymentDate);
+  const ld = new Date(loanDate);
+  const monthsDiff =
+    (pd.getFullYear() - ld.getFullYear()) * 12 +
+    (pd.getMonth() - ld.getMonth());
+  return Math.max(1, monthsDiff + 1);
+}
+
 type Props = { loanId: string };
 
 export function LoanDetailClient({ loanId }: Props) {
@@ -110,6 +125,18 @@ export function LoanDetailClient({ loanId }: Props) {
       ? (parseFloat(loan.paidAmount) / parseFloat(loan.totalOwed)) * 100
       : 0;
 
+  // Overdue detection
+  const isOverdue =
+    new Date() > new Date(loan.dueDate) &&
+    parseFloat(loan.remainingAmount) > 0 &&
+    loan.status === "APPROVED";
+  const daysOverdue = isOverdue
+    ? Math.floor(
+        (new Date().getTime() - new Date(loan.dueDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : 0;
+
   return (
     <div className="space-y-6">
       {/* Back button */}
@@ -125,7 +152,15 @@ export function LoanDetailClient({ loanId }: Props) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{loan.loanNumber}</CardTitle>
-            <Badge variant={badge.variant}>{badge.label}</Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={badge.variant}>{badge.label}</Badge>
+              {isOverdue && (
+                <Badge variant="destructive">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Terlambat {daysOverdue} hari
+                </Badge>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -264,6 +299,7 @@ export function LoanDetailClient({ loanId }: Props) {
           <TableRoot>
             <TableHeader>
               <TableRow>
+                <TableHead>Periode</TableHead>
                 <TableHead>Tanggal</TableHead>
                 <TableHead>Nominal</TableHead>
                 <TableHead>Status</TableHead>
@@ -276,15 +312,29 @@ export function LoanDetailClient({ loanId }: Props) {
             <TableBody>
               {loan.payments.length === 0 ? (
                 <TableEmpty
-                  colSpan={canVerifyPayment ? 7 : 6}
+                  colSpan={canVerifyPayment ? 8 : 7}
                   message="Belum ada pembayaran."
                 />
               ) : (
                 loan.payments.map((p) => {
                   const pBadge = PAYMENT_STATUS[p.status];
                   const isPendingPayment = p.status === "PENDING";
+                  const paymentMonth = computePaymentMonth(
+                    p.paymentDate,
+                    loan.loanDate
+                  );
                   return (
                     <TableRow key={p.id}>
+                      <TableCell>
+                        <span className="font-medium">
+                          Bulan ke-{paymentMonth}
+                        </span>
+                        {paymentMonth > loan.durationMonths && (
+                          <span className="ml-1 text-xs text-amber-600">
+                            (lebih)
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell>{formatDate(p.paymentDate)}</TableCell>
                       <TableCell className="font-medium">
                         {formatCurrency(p.amount)}

@@ -7,11 +7,12 @@ import { LoanStatus } from "@prisma/client";
 import { ListQueryParams } from ".";
 
 export type ListLoanQueryParam = {
-  status?: LoanStatus;
+  status?: LoanStatus | "OVERDUE";
   borrowerId?: string;
   accountId?: string;
   dateFrom?: string;
   dateTo?: string;
+  overdue?: boolean;
 } & ListQueryParams;
 
 export type ListLoanPaymentQueryParam = {
@@ -128,6 +129,7 @@ export type LoanSummary = {
   totalOutstanding: number;
   totalDisbursedThisMonth: number;
   pendingCount: number;
+  overdueCount: number;
 };
 
 export type CreateLoanPayload = {

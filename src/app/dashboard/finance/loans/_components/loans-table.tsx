@@ -12,6 +12,7 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { useLoans, useDeleteLoan } from "@/hooks/use-loans";
 import { usePermissions } from "@/hooks/use-permission";
@@ -63,6 +64,14 @@ function formatCurrency(value: string | number): string {
   }).format(num);
 }
 
+function isLoanOverdue(loan: LoanProfile): boolean {
+  return (
+    loan.status === "APPROVED" &&
+    new Date() > new Date(loan.dueDate) &&
+    parseFloat(loan.remainingAmount) > 0
+  );
+}
+
 export function LoansTable() {
   const { can } = usePermissions();
   const [page, setPage] = useState(1);
@@ -76,7 +85,11 @@ export function LoansTable() {
     page,
     limit: 10,
     search,
-    ...(statusFilter ? { status: statusFilter as LoanStatus } : {}),
+    ...(statusFilter === "OVERDUE"
+      ? { overdue: true }
+      : statusFilter
+      ? { status: statusFilter as LoanStatus }
+      : {}),
   });
 
   const deleteLoan = useDeleteLoan();
@@ -102,7 +115,7 @@ export function LoansTable() {
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard
           label="Pinjaman Aktif"
           value={summary?.totalActive ?? 0}
@@ -131,6 +144,13 @@ export function LoansTable() {
           iconColor="text-orange-600"
           iconBg="bg-orange-50"
         />
+        <StatCard
+          label="Terlambat"
+          value={summary?.overdueCount ?? 0}
+          icon={AlertTriangle}
+          iconColor="text-red-600"
+          iconBg="bg-red-50"
+        />
       </div>
 
       {/* Filters */}
@@ -154,6 +174,7 @@ export function LoansTable() {
             { value: "APPROVED", label: "Disetujui" },
             { value: "REJECTED", label: "Ditolak" },
             { value: "PAID_OFF", label: "Lunas" },
+            { value: "OVERDUE", label: "Terlambat" },
           ]}
           value={statusFilter}
           onChange={(e) => {
@@ -203,6 +224,7 @@ export function LoansTable() {
             ) : (
               loans.map((loan) => {
                 const badge = STATUS_BADGE[loan.status];
+                const overdue = isLoanOverdue(loan);
                 return (
                   <TableRow key={loan.id}>
                     <TableCell>
@@ -233,7 +255,12 @@ export function LoansTable() {
                     </TableCell>
                     <TableCell>{formatDate(loan.dueDate)}</TableCell>
                     <TableCell>
-                      <Badge variant={badge.variant}>{badge.label}</Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant={badge.variant}>{badge.label}</Badge>
+                        {overdue && (
+                          <Badge variant="destructive">Terlambat</Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-1">

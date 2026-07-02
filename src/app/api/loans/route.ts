@@ -14,6 +14,7 @@ export type LoanListSummary = {
   totalOutstanding: number;
   totalDisbursedThisMonth: number;
   pendingCount: number;
+  overdueCount: number;
 };
 
 const includeRelations = {
@@ -62,6 +63,11 @@ export async function GET(request: NextRequest) {
     const accountId = searchParams.get("accountId") ?? undefined;
     const dateFrom = searchParams.get("dateFrom") ?? undefined;
     const dateTo = searchParams.get("dateTo") ?? undefined;
+    const overdue = searchParams.get("overdue") === "true";
+
+    // Current date for overdue detection
+    const currentDate = new Date();
+    currentDate.setHours(23, 59, 59, 999);
 
     const where = {
       organizationId: orgId,
@@ -77,7 +83,7 @@ export async function GET(request: NextRequest) {
           },
         ],
       }),
-      ...(status && { status: status as LoanStatus }),
+      ...(status && status !== "OVERDUE" && { status: status as LoanStatus }),
       ...(borrowerId && { borrowerId }),
       ...(accountId && { accountId }),
       ...((dateFrom || dateTo) && {
@@ -85,6 +91,12 @@ export async function GET(request: NextRequest) {
           ...(dateFrom && { gte: new Date(dateFrom) }),
           ...(dateTo && { lte: new Date(dateTo) }),
         },
+      }),
+      // Overdue filter: dueDate < now AND remainingAmount > 0 AND status = APPROVED
+      ...(overdue && {
+        status: LoanStatus.APPROVED,
+        dueDate: { lt: currentDate },
+        remainingAmount: { gt: 0 },
       }),
     };
 
@@ -105,6 +117,7 @@ export async function GET(request: NextRequest) {
       outstandingResult,
       monthResult,
       pendingCount,
+      overdueCount,
       total,
     ] = await prisma.$transaction([
       prisma.loan.findMany({
@@ -133,6 +146,16 @@ export async function GET(request: NextRequest) {
       prisma.loan.count({
         where: { ...where, status: LoanStatus.PENDING },
       }),
+      // Overdue count: approved loans past due date with remaining balance
+      prisma.loan.count({
+        where: {
+          organizationId: orgId,
+          deletedAt: null,
+          status: LoanStatus.APPROVED,
+          dueDate: { lt: currentDate },
+          remainingAmount: { gt: 0 },
+        },
+      }),
       prisma.loan.count({ where }),
     ]);
 
@@ -141,6 +164,7 @@ export async function GET(request: NextRequest) {
       totalOutstanding: Number(outstandingResult._sum.remainingAmount ?? 0),
       totalDisbursedThisMonth: Number(monthResult._sum.principal ?? 0),
       pendingCount,
+      overdueCount,
     };
 
     const metadata = generateMetadataPagination(page, limit, total);

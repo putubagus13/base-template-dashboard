@@ -345,7 +345,7 @@ export function LoanFormDialog({ open, onClose, loan }: LoanFormDialogProps) {
             </FormField>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Durasi (Bulan)" htmlFor="duration" required>
+            <FormField label="Jangka Waktu (Bulan)" htmlFor="duration" required>
               <Input
                 id="duration"
                 type="number"
@@ -353,6 +353,9 @@ export function LoanFormDialog({ open, onClose, loan }: LoanFormDialogProps) {
                 value={durationMonths}
                 onChange={(e) => setDurationMonths(e.target.value)}
               />
+              <p className="text-xs text-slate-400 mt-1">
+                Untuk perhitungan bunga & jatuh tempo
+              </p>
             </FormField>
             <FormField label="Tanggal Pinjaman" htmlFor="loan-date" required>
               <Input
@@ -454,7 +457,7 @@ export function LoanFormDialog({ open, onClose, loan }: LoanFormDialogProps) {
               <span className="font-semibold">{interestRate}%/bulan</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">Durasi:</span>
+              <span className="text-slate-500">Jangka Waktu:</span>
               <span className="font-semibold">{durationMonths} bulan</span>
             </div>
             <div className="flex justify-between">
