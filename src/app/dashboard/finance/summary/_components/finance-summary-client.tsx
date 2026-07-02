@@ -95,20 +95,20 @@ export function FinanceSummaryClient() {
   return (
     <div className="space-y-6">
       {/* Month Filter */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">Periode:</p>
+      <div className="flex flex-wrap-reverse items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleExport}
-            isLoading={isExporting}
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
+          <p className="text-sm text-slate-500">Periode:</p>
           <MonthPicker year={year} month={month} onChange={handleMonthChange} />
         </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleExport}
+          isLoading={isExporting}
+        >
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
       </div>
 
       {/* Section 1: Overview Stats */}

@@ -330,9 +330,9 @@ export function MeetingDetailClient({ meetingId }: MeetingDetailClientProps) {
 
           {/* Bulk Actions */}
           <PermissionGuard permission="update:attendance">
-            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
               <span className="text-sm font-medium text-slate-700">
-                Aksi Massal:
+                Tandai Semua:
               </span>
               <Select
                 options={statusOptions}

@@ -139,8 +139,8 @@ export function UsersTable() {
           iconBg="bg-violet-50"
         />
       </div>
-      <div className="flex w-full items-center justify-between gap-4 border-b border-slate-200 py-3">
-        <div className="flex items-center gap-3 flex-1">
+      <div className="flex flex-wrap w-full items-center justify-between gap-4 border-b border-slate-200 py-3">
+        <div className="flex flex-wrap items-center gap-3 md:flex-1">
           <SearchBar
             value={search}
             onChange={handleSearch}
